@@ -44,6 +44,6 @@ Don't hesitate to check the [API Reference](https://pub.dev/documentation/bubble
 
 You have a lot of options to contribute to this project ! You can :
 
-* [Fork it](https://github.com/Skyost/rate_my_app/fork) on Github.
-* [Submit](https://github.com/Skyost/rate_my_app/issues/new/choose) a feature request or a bug report.
+* [Fork it](https://github.com/Skyost/BubbleShowcase/fork) on Github.
+* [Submit](https://github.com/Skyost/BubbleShowcase/issues/new/choose) a feature request or a bug report.
 * [Donate](https://paypal.me/Skyost) to the developer.
