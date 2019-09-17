@@ -52,13 +52,13 @@ class Position {
 /// A simple painter that allows to highlight a specific zone on the screen by darkening the whole screen (apart the specified zone).
 class OverlayPainter extends CustomPainter {
   /// The bubble slide.
-  BubbleSlide _slide;
+  final BubbleSlide _slide;
 
   /// The position to highlight.
-  Position _position;
+  final Position _position;
 
   /// Creates a new overlay painter instance.
-  OverlayPainter(this._slide, this._position);
+  const OverlayPainter(this._slide, this._position);
 
   @override
   void paint(Canvas canvas, Size size) {
