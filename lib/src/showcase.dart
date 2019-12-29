@@ -8,10 +8,10 @@ import 'package:shared_preferences/shared_preferences.dart';
 /// The BubbleShowcase main widget.
 class BubbleShowcase extends StatefulWidget {
   /// This showcase identifier. Must be unique across the app.
-  final String bubbleShowCaseId;
+  final String bubbleShowcaseId;
 
   /// This showcase version.
-  final int bubbleShowCaseVersion;
+  final int bubbleShowcaseVersion;
 
   /// Whether this showcase should reopen once closed.
   final bool doNotReopenOnClose;
@@ -30,8 +30,8 @@ class BubbleShowcase extends StatefulWidget {
 
   /// Creates a new bubble showcase instance.
   BubbleShowcase({
-    @required this.bubbleShowCaseId,
-    @required this.bubbleShowCaseVersion,
+    @required this.bubbleShowcaseId,
+    @required this.bubbleShowcaseVersion,
     this.doNotReopenOnClose = false,
     @required this.bubbleSlides,
     this.child,
@@ -48,7 +48,7 @@ class BubbleShowcase extends StatefulWidget {
       return true;
     }
     SharedPreferences preferences = await SharedPreferences.getInstance();
-    bool result = preferences.getBool(bubbleShowCaseId + '.' + bubbleShowCaseVersion.toString());
+    bool result = preferences.getBool(bubbleShowcaseId + '.' + bubbleShowcaseVersion.toString());
     return result == null || result;
   }
 }
@@ -110,7 +110,7 @@ class _BubbleShowcaseState extends State<BubbleShowcase> with WidgetsBindingObse
     _currentSlideEntry = null;
     if (widget.doNotReopenOnClose) {
       SharedPreferences.getInstance().then((preferences) {
-        preferences.setBool(widget.bubbleShowCaseId + '.' + widget.bubbleShowCaseVersion.toString(), false);
+        preferences.setBool(widget.bubbleShowcaseId + '.' + widget.bubbleShowcaseVersion.toString(), false);
       });
     }
   }

@@ -33,8 +33,8 @@ class _BubbleShowcaseDemoWidget extends StatelessWidget {
           color: Colors.white,
         );
     return BubbleShowcase(
-      bubbleShowCaseId: 'my_bubble_showcase',
-      bubbleShowCaseVersion: 1,
+      bubbleShowcaseId: 'my_bubble_showcase',
+      bubbleShowcaseVersion: 1,
       bubbleSlides: [
         _firstSlide(textStyle),
         _secondSlide(textStyle),
@@ -80,7 +80,7 @@ class _BubbleShowcaseDemoWidget extends StatelessWidget {
 
   /// Creates the second slide.
   BubbleSlide _secondSlide(TextStyle textStyle) => AbsoluteBubbleSlide(
-        calculateHighlightPosition: (size) => Position(
+        positionCalculator: (size) => Position(
           top: 0,
           right: 0,
           left: 0,
@@ -179,7 +179,7 @@ class _BubbleShowcaseDemoChild extends StatelessWidget {
               ),
             ),
             RaisedButton(
-              child: Text('This button is old, please don\'t take care.'),
+              child: Text('This button is old, please don\'t pay attention.'),
               onPressed: () {},
             )
           ],

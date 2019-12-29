@@ -3,6 +3,9 @@ import 'package:bubble_showcase/src/showcase.dart';
 import 'package:bubble_showcase/src/util.dart';
 import 'package:flutter/material.dart';
 
+/// A function that allows to calculate a position according to a provided size.
+typedef Position PositionCalculator(Size size);
+
 /// A simple bubble slide that allows to highlight a specific screen zone.
 abstract class BubbleSlide {
   /// The slide shape.
@@ -121,7 +124,7 @@ class RelativeBubbleSlide extends BubbleSlide {
 /// A bubble slide with an absolute position on the screen.
 class AbsoluteBubbleSlide extends BubbleSlide {
   /// The function that allows to compute the highlight position according to the parent size.
-  final Position Function(Size) calculateHighlightPosition;
+  final PositionCalculator positionCalculator;
 
   /// Creates a new absolute bubble slide instance.
   const AbsoluteBubbleSlide({
@@ -132,7 +135,7 @@ class AbsoluteBubbleSlide extends BubbleSlide {
       spreadRadius: 0,
     ),
     BubbleSlideChild child,
-    @required this.calculateHighlightPosition,
+    @required this.positionCalculator,
   }) : super(
           shape: shape,
           boxShadow: boxShadow,
@@ -140,7 +143,7 @@ class AbsoluteBubbleSlide extends BubbleSlide {
         );
 
   @override
-  Position getHighlightPosition(BuildContext context, BubbleShowcase bubbleShowcase, int currentSlideIndex) => calculateHighlightPosition(MediaQuery.of(context).size);
+  Position getHighlightPosition(BuildContext context, BubbleShowcase bubbleShowcase, int currentSlideIndex) => positionCalculator(MediaQuery.of(context).size);
 }
 
 /// A bubble slide child, holding a widget.
@@ -216,16 +219,16 @@ class RelativeBubbleSlideChild extends BubbleSlideChild {
 /// A bubble slide child with an absolute position on the screen.
 class AbsoluteBubbleSlideChild extends BubbleSlideChild {
   /// The function that allows to compute the child position according to the parent size.
-  final Position Function(Size) calculatePosition;
+  final PositionCalculator positionCalculator;
 
   /// Creates a new absolute bubble slide child instance.
   const AbsoluteBubbleSlideChild({
     Widget widget,
-    @required this.calculatePosition,
+    @required this.positionCalculator,
   }) : super(
           widget: widget,
         );
 
   @override
-  Position getPosition(BuildContext context, Position highlightPosition, Size parentSize) => calculatePosition(parentSize);
+  Position getPosition(BuildContext context, Position highlightPosition, Size parentSize) => positionCalculator(parentSize);
 }
