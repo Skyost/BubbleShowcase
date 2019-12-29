@@ -44,6 +44,7 @@ The speech bubble will be placed on the right of the widget.
 BubbleShowcase is not limited to highlight a specific widget. You can also highlight a specific part of your app by its coordinates :
 
 ```dart
+BubbleShowcase(
   bubbleShowcaseId: 'my_bubble_showcase',
   bubbleShowcaseVersion: 1,
   bubbleSlides: [
@@ -74,6 +75,7 @@ BubbleShowcase is not limited to highlight a specific widget. You can also highl
     ),
   ],
   child: MyMainWidget(),
+);
 ```
 
 This will display the speech bubble on the top left corner of your app.
