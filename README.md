@@ -1,7 +1,7 @@
 # BubbleShowcase
 
 **BubbleShowcase** is a small but powerful flutter package that allows you to highlight
-specific parts of your app to explain them to the user or to showcase your app new features.
+specific parts of your app (to explain them to the user for instance) or to showcase your app new features.
 
 ![Preview](https://github.com/Skyost/BubbleShowcase/blob/master/screenshots/preview.gif)
 
@@ -84,12 +84,12 @@ This will display the speech bubble on the top left corner of your app.
 
 The showcase is where everything begins. Let's see the available options :
 
-* `bubbleShowcaseId` The showcase identifier. Must be unique across the app as it used as a saving mean; for instance when the showcase should not be reopened (**required**).
-* `bubbleShowcaseVersion` The showcase version. Increase it when you update the showcase, this allows to redisplay the showcase to the user if `doNotReopenOnClose` is set to `true` (**required**).
+* `bubbleShowcaseId` The showcase identifier. Must be unique across the app as it is used as a saving mean; for instance when the showcase should not be reopened (**required**).
+* `bubbleShowcaseVersion` The showcase version. Increase it when you update the showcase, this allows to redisplay the it to the user if `doNotReopenOnClose` is set to `true` (**required**).
 * `doNotReopenOnClose` Whether this showcase should be reopened once closed.
 * `bubbleSlides` The slides to display (**required** & **must not be empty**).
-* `child` The widget to display below the slides.
-* `counterText` The current slide counter. `:i` is the current slide number and `:n` is the maximum slide number.
+* `child` The widget to display below the slides. It should be your app main widget.
+* `counterText` The current slide counter text. `:i` targets the current slide number and `:n` targets the maximum slide number.
 * `showCloseButton` Whether to show a little close button on the top left of the slide.
 
 ### The slides
@@ -97,26 +97,26 @@ The showcase is where everything begins. Let's see the available options :
 The slides is what is highlighting a specific part of your app.
 There are two main categories of positioning : _Absolute_ and _Relative_. Here is a little summary :
 
-| Position | Class name            | Use case                                                                                    | Specific options                                                                      |
-|----------|-----------------------|---------------------------------------------------------------------------------------------|---------------------------------------------------------------------------------------|
-| Absolute | `AbsoluteBubbleSlide` | You want to position your slide according to a _x_, _y_ position and not a specific widget. | * `positionCalculator` The function that calculates the slide position on the screen. |
-| Relative | `RelativeBubbleSlide` | You want to position your slide according to a specific widget.                             | * `widgetKey` The global key that the target widget is holding.                       |
+| Position | Class name            | Use case                                                                                                  | Specific options                                                                    |
+|----------|-----------------------|-----------------------------------------------------------------------------------------------------------|-------------------------------------------------------------------------------------|
+| Absolute | `AbsoluteBubbleSlide` | You want to position your slide according to a _x_, _y_ position on the screen and not a specific widget. | `positionCalculator` The function that calculates the slide position on the screen. |
+| Relative | `RelativeBubbleSlide` | You want to position your slide according to a specific widget.                                           | `widgetKey` The global key that the target widget is holding.                       |
 
 All slides have these options in common :
 
 * `shape` The slide shape (available are `Rectangle`, `RoundedRectangle`, `Oval` and `Circle` but you can add a custom one by extending the `Shape` class).
 * `boxShadow` The slide box shadow (containing the color, the blur radius, the spread radius, ...).
-* `child` The slide child (**required**).
+* `child` The slide child, see below (**required**).
 
 ### The slides children
 
-Slides children are what are displayed according to what you are highlighting (for instance, a speech bubble).
-The same positioning is also available for children :
+Slides children are what are displayed according to what you are highlighting (it can be a speech bubble for example).
+The same positioning system is also available for children :
 
-| Position | Class name                 | Use case                                                                                                    | Options                                                                               |
-|----------|----------------------------|-------------------------------------------------------------------------------------------------------------|---------------------------------------------------------------------------------------|
-| Absolute | `AbsoluteBubbleSlideChild` | You want to position the child according to a _x_, _y_ position and not the highlighted part of the screen. | * `positionCalculator` The function that calculates the slide position on the screen. |
-| Relative | `RelativeBubbleSlideChild` | You want to position the child according to the highlighted zone.                                           | * `direction` Where to position the child compared to the highlighted zone.           |
+| Position | Class name                 | Use case                                                                                                                  | Specific options                                                                    |
+|----------|----------------------------|---------------------------------------------------------------------------------------------------------------------------|-------------------------------------------------------------------------------------|
+| Absolute | `AbsoluteBubbleSlideChild` | You want to position the child according to a _x_, _y_ position on the screen and not the highlighted part of the screen. | `positionCalculator` The function that calculates the child position on the screen. |
+| Relative | `RelativeBubbleSlideChild` | You want to position the child according to the highlighted zone.                                                         | `direction` Where to position the child compared to the highlighted zone.           |
 
 All children have these options in common :
 
