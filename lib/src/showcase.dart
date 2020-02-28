@@ -85,13 +85,17 @@ class _BubbleShowcaseState extends State<BubbleShowcase> with WidgetsBindingObse
 
   @override
   void dispose() {
-    _currentSlideEntry.remove();
+    _currentSlideEntry?.remove();
     WidgetsBinding.instance.removeObserver(this);
     super.dispose();
   }
 
   @override
   void didChangeMetrics() {
+    if(_currentSlideEntry == null) {
+      return;
+    }
+
     SchedulerBinding.instance.addPostFrameCallback((_) {
       _currentSlideEntry.remove();
       Overlay.of(context).insert(_currentSlideEntry);
@@ -101,17 +105,22 @@ class _BubbleShowcaseState extends State<BubbleShowcase> with WidgetsBindingObse
   /// Returns whether the showcasing is finished.
   bool get _isFinished => _currentSlideIndex == -1 || _currentSlideIndex == widget.bubbleSlides.length;
 
-  /// Closes the showcase if finished.
-  void _closeIfFinished() {
-    if (!_isFinished) {
-      return;
-    }
+  /// Allows to go to the next entry (or to close the showcase if needed).
+  void _goToNextEntryOrClose(int position) {
+    _currentSlideIndex = position;
+    _currentSlideEntry.remove();
 
-    _currentSlideEntry = null;
-    if (widget.doNotReopenOnClose) {
-      SharedPreferences.getInstance().then((preferences) {
-        preferences.setBool(widget.bubbleShowcaseId + '.' + widget.bubbleShowcaseVersion.toString(), false);
-      });
+    if (_isFinished) {
+      _currentSlideEntry = null;
+      if (widget.doNotReopenOnClose) {
+        SharedPreferences.getInstance().then((preferences) {
+          preferences.setBool(widget.bubbleShowcaseId + '.' + widget.bubbleShowcaseVersion.toString(), false);
+        });
+      }
+    }
+    else {
+      _currentSlideEntry = _createCurrentSlideEntry();
+      Overlay.of(context).insert(_currentSlideEntry);
     }
   }
 
@@ -121,16 +130,9 @@ class _BubbleShowcaseState extends State<BubbleShowcase> with WidgetsBindingObse
           context,
           widget,
           _currentSlideIndex,
-          (position) => setState(() {
-            _currentSlideIndex = position;
-            _currentSlideEntry.remove();
-            _closeIfFinished();
-
-            if (!_isFinished) {
-              _currentSlideEntry = _createCurrentSlideEntry();
-              Overlay.of(context).insert(_currentSlideEntry);
-            }
-          }),
+          (position) {
+            setState(() => _goToNextEntryOrClose(position));
+          },
         ),
       );
 }

@@ -1,10 +1,10 @@
 import 'package:bubble_showcase/src/shape.dart';
 import 'package:bubble_showcase/src/showcase.dart';
-import 'package:bubble_showcase/src/util.dart';
+import 'package:bubble_showcase/src/utils.dart';
 import 'package:flutter/material.dart';
 
 /// A function that allows to calculate a position according to a provided size.
-typedef Position PositionCalculator(Size size);
+typedef PositionCalculator = Position Function(Size size);
 
 /// A simple bubble slide that allows to highlight a specific screen zone.
 abstract class BubbleSlide {
@@ -44,7 +44,7 @@ abstract class BubbleSlide {
     }
 
     int slidesCount = bubbleShowcase.bubbleSlides.length;
-    Color writeColor = Util.isColorDark(boxShadow.color) ? Colors.white : Colors.black;
+    Color writeColor = Utils.isColorDark(boxShadow.color) ? Colors.white : Colors.black;
     if (bubbleShowcase.counterText != null) {
       children.add(
         Positioned(

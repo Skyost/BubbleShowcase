@@ -2,12 +2,9 @@ import 'package:bubble_showcase/src/slide.dart';
 import 'package:flutter/material.dart';
 
 /// Contains some useful methods.
-class Util {
+class Utils {
   /// Returns whether a specified color is dark.
-  static bool isColorDark(Color color) {
-    double darkness = 1 - (0.299 * color.red + 0.587 * color.green + 0.114 * color.blue) / 255;
-    return darkness > 0.5;
-  }
+  static bool isColorDark(Color color) => color.computeLuminance() <= 0.5;
 }
 
 /// Represents a position on the screen.
