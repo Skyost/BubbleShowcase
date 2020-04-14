@@ -49,7 +49,7 @@ class _BubbleShowcaseDemoWidget extends StatelessWidget {
         widgetKey: _titleKey,
         child: RelativeBubbleSlideChild(
           widget: Padding(
-            padding: const EdgeInsets.only(top: 2),
+            padding: const EdgeInsets.only(top: 8),
             child: SpeechBubble(
               nipLocation: NipLocation.TOP,
               color: Colors.blue,
@@ -87,18 +87,21 @@ class _BubbleShowcaseDemoWidget extends StatelessWidget {
           bottom: size.height,
         ),
         child: RelativeBubbleSlideChild(
-          widget: SpeechBubble(
-            nipLocation: NipLocation.LEFT,
-            color: Colors.teal,
-            child: Padding(
-              padding: const EdgeInsets.all(10),
-              child: Text(
-                'Look at me pointing absolutely nothing.\n(Or maybe that\'s an hidden navigation bar !)',
-                style: textStyle,
+          widget: Padding(
+            padding: const EdgeInsets.only(left: 8),
+            child: SpeechBubble(
+              nipLocation: NipLocation.LEFT,
+              color: Colors.teal,
+              child: Padding(
+                padding: const EdgeInsets.all(10),
+                child: Text(
+                  'Look at me pointing absolutely nothing.\n(Or maybe that\'s an hidden navigation bar !)',
+                  style: textStyle,
+                ),
               ),
             ),
           ),
-          direction: AxisDirection.right,
+          direction: AxisDirection.left,
         ),
       );
 
@@ -110,7 +113,7 @@ class _BubbleShowcaseDemoWidget extends StatelessWidget {
         ),
         child: RelativeBubbleSlideChild(
           widget: Padding(
-            padding: const EdgeInsets.only(top: 10),
+            padding: const EdgeInsets.only(top: 23),
             child: SpeechBubble(
               nipLocation: NipLocation.TOP,
               color: Colors.purple,

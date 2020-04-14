@@ -48,7 +48,7 @@ class BubbleShowcase extends StatefulWidget {
       return true;
     }
     SharedPreferences preferences = await SharedPreferences.getInstance();
-    bool result = preferences.getBool(bubbleShowcaseId + '.' + bubbleShowcaseVersion.toString());
+    bool result = preferences.getBool('$bubbleShowcaseId.$bubbleShowcaseVersion');
     return result == null || result;
   }
 }
