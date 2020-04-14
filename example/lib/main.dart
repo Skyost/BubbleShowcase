@@ -12,7 +12,7 @@ class _BubbleShowcaseDemoApp extends StatelessWidget {
         title: 'Bubble Showcase Demo',
         home: Scaffold(
           appBar: AppBar(
-            title: Text('Bubble Showcase Demo'),
+            title: const Text('Bubble Showcase Demo'),
           ),
           body: _BubbleShowcaseDemoWidget(),
         ),
@@ -49,12 +49,12 @@ class _BubbleShowcaseDemoWidget extends StatelessWidget {
         widgetKey: _titleKey,
         child: RelativeBubbleSlideChild(
           widget: Padding(
-            padding: EdgeInsets.only(top: 2),
+            padding: const EdgeInsets.only(top: 2),
             child: SpeechBubble(
               nipLocation: NipLocation.TOP,
               color: Colors.blue,
               child: Padding(
-                padding: EdgeInsets.all(10),
+                padding: const EdgeInsets.all(10),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   mainAxisSize: MainAxisSize.min,
@@ -91,7 +91,7 @@ class _BubbleShowcaseDemoWidget extends StatelessWidget {
             nipLocation: NipLocation.LEFT,
             color: Colors.teal,
             child: Padding(
-              padding: EdgeInsets.all(10),
+              padding: const EdgeInsets.all(10),
               child: Text(
                 'Look at me pointing absolutely nothing.\n(Or maybe that\'s an hidden navigation bar !)',
                 style: textStyle,
@@ -105,22 +105,22 @@ class _BubbleShowcaseDemoWidget extends StatelessWidget {
   /// Creates the third slide.
   BubbleSlide _thirdSlide(TextStyle textStyle) => RelativeBubbleSlide(
         widgetKey: _firstButtonKey,
-        shape: Oval(
+        shape: const Oval(
           spreadRadius: 15,
         ),
         child: RelativeBubbleSlideChild(
           widget: Padding(
-            padding: EdgeInsets.only(top: 10),
+            padding: const EdgeInsets.only(top: 10),
             child: SpeechBubble(
               nipLocation: NipLocation.TOP,
               color: Colors.purple,
               child: Padding(
-                padding: EdgeInsets.all(10),
+                padding: const EdgeInsets.all(10),
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     Padding(
-                      padding: EdgeInsets.only(right: 5),
+                      padding: const EdgeInsets.only(right: 5),
                       child: Icon(
                         Icons.info_outline,
                         color: Colors.white,
@@ -154,7 +154,7 @@ class _BubbleShowcaseDemoChild extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Padding(
-        padding: EdgeInsets.symmetric(
+        padding: const EdgeInsets.symmetric(
           vertical: 40,
           horizontal: 20,
         ),
@@ -171,15 +171,15 @@ class _BubbleShowcaseDemoChild extends StatelessWidget {
               width: MediaQuery.of(context).size.width,
             ),
             Padding(
-              padding: EdgeInsets.only(top: 30),
+              padding: const EdgeInsets.only(top: 30),
               child: RaisedButton(
-                child: Text('This button is NEW !'),
+                child: const Text('This button is NEW !'),
                 key: _firstButtonKey,
                 onPressed: () {},
               ),
             ),
             RaisedButton(
-              child: Text('This button is old, please don\'t pay attention.'),
+              child: const Text('This button is old, please don\'t pay attention.'),
               onPressed: () {},
             )
           ],

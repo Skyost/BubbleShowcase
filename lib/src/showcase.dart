@@ -63,17 +63,12 @@ class _BubbleShowcaseState extends State<BubbleShowcase> with WidgetsBindingObse
 
   @override
   void initState() {
-    if (_currentSlideEntry != null) {
-      _currentSlideEntry.remove();
-    }
-    _currentSlideEntry = _createCurrentSlideEntry();
-
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       if (await widget.shouldOpenShowcase) {
         _currentSlideIndex++;
+        _currentSlideEntry = _createCurrentSlideEntry();
+        Overlay.of(context).insert(_currentSlideEntry);
       }
-
-      Overlay.of(context).insert(_currentSlideEntry);
     });
     WidgetsBinding.instance.addObserver(this);
 
@@ -114,7 +109,7 @@ class _BubbleShowcaseState extends State<BubbleShowcase> with WidgetsBindingObse
       _currentSlideEntry = null;
       if (widget.doNotReopenOnClose) {
         SharedPreferences.getInstance().then((preferences) {
-          preferences.setBool(widget.bubbleShowcaseId + '.' + widget.bubbleShowcaseVersion.toString(), false);
+          preferences.setBool('${widget.bubbleShowcaseId}.${widget.bubbleShowcaseVersion}', false);
         });
       }
     }
