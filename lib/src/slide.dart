@@ -18,6 +18,15 @@ abstract class BubbleSlide {
   /// The slide child.
   final BubbleSlideChild child;
 
+  // The slide child build function (optional). Receives the `nextSlide` function used to trigger slide changes.
+  final BubbleSlideChild Function(BuildContext, Function) builder;
+  
+  // Duration by which slide will be visible on screen, before switching to the next slide.
+  final Duration duration;
+
+  // Whether the slide should be dismissed when tapping anywhere on the screen. Defaults to false.
+  final bool disableOutsideTap;
+
   /// Creates a new bubble slide instance.
   const BubbleSlide({
     this.shape = const Rectangle(),
@@ -27,6 +36,9 @@ abstract class BubbleSlide {
       spreadRadius: 0,
     ),
     this.child,
+    this.duration,
+    this.disableOutsideTap = false,
+    this.builder,
   });
 
   /// Builds the whole slide widget.
@@ -40,8 +52,18 @@ abstract class BubbleSlide {
       ),
     ];
 
-    if (child != null && child.widget != null) {
-      children.add(child.build(context, highlightPosition, MediaQuery.of(context).size));
+    void _defaultAction() {
+      goToSlide(currentSlideIndex +1);
+    };
+
+    var childWidget = child;
+
+    if (builder != null) {
+      childWidget = builder(context, _defaultAction);
+    }
+
+    if (childWidget != null && childWidget.widget != null) {
+      children.add(childWidget.build(context, highlightPosition, MediaQuery.of(context).size));
     }
 
     int slidesCount = bubbleShowcase.bubbleSlides.length;
@@ -75,8 +97,20 @@ abstract class BubbleSlide {
       ));
     }
 
+    if (duration != null) {
+      Future.delayed(duration).then((_) => _defaultAction());
+      return GestureDetector(
+        onTap: () {},
+        child: Stack(
+          children: children,
+        ),
+      );
+    }
+
     return GestureDetector(
-      onTap: () => goToSlide(currentSlideIndex + 1),
+      onTap: disableOutsideTap ?
+        () {} :
+        _defaultAction,
       child: Stack(
         children: children,
       ),
@@ -101,11 +135,17 @@ class RelativeBubbleSlide extends BubbleSlide {
       spreadRadius: 0,
     ),
     BubbleSlideChild child,
+    Function(BuildContext, Function) builder,
+    Duration duration,
+    bool disableOutsideTap,
     @required this.widgetKey,
   }) : super(
           shape: shape,
           boxShadow: boxShadow,
           child: child,
+          builder: builder,
+          duration: duration,
+          disableOutsideTap: disableOutsideTap ?? false,
         );
 
   @override
@@ -137,10 +177,16 @@ class AbsoluteBubbleSlide extends BubbleSlide {
     ),
     BubbleSlideChild child,
     @required this.positionCalculator,
+    Function(BuildContext, Function) builder,
+    Duration duration,
+    bool disableOutsideTap,
   }) : super(
           shape: shape,
           boxShadow: boxShadow,
           child: child,
+          builder: builder,
+          duration: duration,
+          disableOutsideTap: disableOutsideTap ?? false,
         );
 
   @override
