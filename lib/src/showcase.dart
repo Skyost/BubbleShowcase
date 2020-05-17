@@ -28,6 +28,12 @@ class BubbleShowcase extends StatefulWidget {
   /// Whether to show a close button.
   final bool showCloseButton;
 
+  // Duration by which delay showcase initialization.
+  final Duration initialDelay;
+
+  // Whether tapping anywhere will trigger the next slide. Defaults to true.
+  final bool nextSlideOnTap;
+
   /// Creates a new bubble showcase instance.
   BubbleShowcase({
     @required this.bubbleShowcaseId,
@@ -37,6 +43,8 @@ class BubbleShowcase extends StatefulWidget {
     this.child,
     this.counterText = ':i/:n',
     this.showCloseButton = true,
+    this.initialDelay = Duration.zero,
+    this.nextSlideOnTap = true,
   }) : assert(bubbleSlides.isNotEmpty);
 
   @override
@@ -67,6 +75,7 @@ class _BubbleShowcaseState extends State<BubbleShowcase> with WidgetsBindingObse
       if (await widget.shouldOpenShowcase) {
         _currentSlideIndex++;
         _currentSlideEntry = _createCurrentSlideEntry();
+        await Future.delayed(widget.initialDelay);
         Overlay.of(context).insert(_currentSlideEntry);
       }
     });
