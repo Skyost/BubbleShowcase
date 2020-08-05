@@ -30,10 +30,16 @@ class Position {
   });
 
   @override
-  String toString() => 'Position(top: $top, right: $right, bottom: $bottom, left: $left)';
+  String toString() =>
+      'Position(top: $top, right: $right, bottom: $bottom, left: $left)';
 
   @override
-  bool operator ==(Object other) => other is Position && top == other.top && right == other.right && bottom == other.bottom && left == other.left;
+  bool operator ==(Object other) =>
+      other is Position &&
+      top == other.top &&
+      right == other.right &&
+      bottom == other.bottom &&
+      left == other.left;
 
   @override
   int get hashCode {
@@ -59,7 +65,8 @@ class OverlayPainter extends CustomPainter {
 
   @override
   void paint(Canvas canvas, Size size) {
-    canvas.saveLayer(Offset.zero & size, Paint()); // Thanks to https://stackoverflow.com/a/51548959.
+    canvas.saveLayer(Offset.zero & size,
+        Paint()); // Thanks to https://stackoverflow.com/a/51548959.
     canvas.drawColor(_slide.boxShadow.color, BlendMode.dstATop);
     _slide.shape.drawOnCanvas(
       canvas,
@@ -75,5 +82,6 @@ class OverlayPainter extends CustomPainter {
   }
 
   @override
-  bool shouldRepaint(OverlayPainter oldOverlay) => oldOverlay._position != _position;
+  bool shouldRepaint(OverlayPainter oldOverlay) =>
+      oldOverlay._position != _position;
 }

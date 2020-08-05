@@ -41,7 +41,9 @@ class RoundedRectangle extends Shape {
 
   @override
   void drawOnCanvas(Canvas canvas, Rect rectangle, Paint paint) {
-    canvas.drawRRect(RRect.fromRectAndRadius(rectangle.inflate(spreadRadius), radius), paint);
+    canvas.drawRRect(
+        RRect.fromRectAndRadius(rectangle.inflate(spreadRadius), radius),
+        paint);
   }
 }
 

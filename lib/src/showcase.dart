@@ -48,13 +48,15 @@ class BubbleShowcase extends StatefulWidget {
       return true;
     }
     SharedPreferences preferences = await SharedPreferences.getInstance();
-    bool result = preferences.getBool('$bubbleShowcaseId.$bubbleShowcaseVersion');
+    bool result =
+        preferences.getBool('$bubbleShowcaseId.$bubbleShowcaseVersion');
     return result == null || result;
   }
 }
 
 /// The BubbleShowcase state.
-class _BubbleShowcaseState extends State<BubbleShowcase> with WidgetsBindingObserver {
+class _BubbleShowcaseState extends State<BubbleShowcase>
+    with WidgetsBindingObserver {
   /// The current slide index.
   int _currentSlideIndex = -1;
 
@@ -87,7 +89,7 @@ class _BubbleShowcaseState extends State<BubbleShowcase> with WidgetsBindingObse
 
   @override
   void didChangeMetrics() {
-    if(_currentSlideEntry == null) {
+    if (_currentSlideEntry == null) {
       return;
     }
 
@@ -98,7 +100,9 @@ class _BubbleShowcaseState extends State<BubbleShowcase> with WidgetsBindingObse
   }
 
   /// Returns whether the showcasing is finished.
-  bool get _isFinished => _currentSlideIndex == -1 || _currentSlideIndex == widget.bubbleSlides.length;
+  bool get _isFinished =>
+      _currentSlideIndex == -1 ||
+      _currentSlideIndex == widget.bubbleSlides.length;
 
   /// Allows to go to the next entry (or to close the showcase if needed).
   void _goToNextEntryOrClose(int position) {
@@ -109,11 +113,12 @@ class _BubbleShowcaseState extends State<BubbleShowcase> with WidgetsBindingObse
       _currentSlideEntry = null;
       if (widget.doNotReopenOnClose) {
         SharedPreferences.getInstance().then((preferences) {
-          preferences.setBool('${widget.bubbleShowcaseId}.${widget.bubbleShowcaseVersion}', false);
+          preferences.setBool(
+              '${widget.bubbleShowcaseId}.${widget.bubbleShowcaseVersion}',
+              false);
         });
       }
-    }
-    else {
+    } else {
       _currentSlideEntry = _createCurrentSlideEntry();
       Overlay.of(context).insert(_currentSlideEntry);
     }

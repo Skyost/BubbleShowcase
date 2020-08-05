@@ -30,8 +30,10 @@ abstract class BubbleSlide {
   });
 
   /// Builds the whole slide widget.
-  Widget build(BuildContext context, BubbleShowcase bubbleShowcase, int currentSlideIndex, void Function(int) goToSlide) {
-    Position highlightPosition = getHighlightPosition(context, bubbleShowcase, currentSlideIndex);
+  Widget build(BuildContext context, BubbleShowcase bubbleShowcase,
+      int currentSlideIndex, void Function(int) goToSlide) {
+    Position highlightPosition =
+        getHighlightPosition(context, bubbleShowcase, currentSlideIndex);
     List<Widget> children = [
       Positioned.fill(
         child: CustomPaint(
@@ -41,11 +43,13 @@ abstract class BubbleSlide {
     ];
 
     if (child != null && child.widget != null) {
-      children.add(child.build(context, highlightPosition, MediaQuery.of(context).size));
+      children.add(
+          child.build(context, highlightPosition, MediaQuery.of(context).size));
     }
 
     int slidesCount = bubbleShowcase.bubbleSlides.length;
-    Color writeColor = Utils.isColorDark(boxShadow.color) ? Colors.white : Colors.black;
+    Color writeColor =
+        Utils.isColorDark(boxShadow.color) ? Colors.white : Colors.black;
     if (bubbleShowcase.counterText != null) {
       children.add(
         Positioned(
@@ -53,8 +57,11 @@ abstract class BubbleSlide {
           left: 0,
           right: 0,
           child: Text(
-            bubbleShowcase.counterText.replaceAll(':i', (currentSlideIndex + 1).toString()).replaceAll(':n', slidesCount.toString()),
-            style: Theme.of(context).textTheme.body1.copyWith(color: writeColor),
+            bubbleShowcase.counterText
+                .replaceAll(':i', (currentSlideIndex + 1).toString())
+                .replaceAll(':n', slidesCount.toString()),
+            style:
+                Theme.of(context).textTheme.body1.copyWith(color: writeColor),
             textAlign: TextAlign.center,
           ),
         ),
@@ -84,7 +91,8 @@ abstract class BubbleSlide {
   }
 
   /// Returns the position to highlight.
-  Position getHighlightPosition(BuildContext context, BubbleShowcase bubbleShowcase, int currentSlideIndex);
+  Position getHighlightPosition(BuildContext context,
+      BubbleShowcase bubbleShowcase, int currentSlideIndex);
 }
 
 /// A bubble slide with a position that depends on another widget.
@@ -109,8 +117,10 @@ class RelativeBubbleSlide extends BubbleSlide {
         );
 
   @override
-  Position getHighlightPosition(BuildContext context, BubbleShowcase bubbleShowcase, int currentSlideIndex) {
-    RenderBox renderBox = widgetKey.currentContext.findRenderObject() as RenderBox;
+  Position getHighlightPosition(BuildContext context,
+      BubbleShowcase bubbleShowcase, int currentSlideIndex) {
+    RenderBox renderBox =
+        widgetKey.currentContext.findRenderObject() as RenderBox;
     Offset offset = renderBox.localToGlobal(Offset.zero);
 
     return Position(
@@ -144,7 +154,9 @@ class AbsoluteBubbleSlide extends BubbleSlide {
         );
 
   @override
-  Position getHighlightPosition(BuildContext context, BubbleShowcase bubbleShowcase, int currentSlideIndex) => positionCalculator(MediaQuery.of(context).size);
+  Position getHighlightPosition(BuildContext context,
+          BubbleShowcase bubbleShowcase, int currentSlideIndex) =>
+      positionCalculator(MediaQuery.of(context).size);
 }
 
 /// A bubble slide child, holding a widget.
@@ -170,7 +182,8 @@ abstract class BubbleSlideChild {
   }
 
   /// Returns child position according to the highlight position and parent size.
-  Position getPosition(BuildContext context, Position highlightPosition, Size parentSize);
+  Position getPosition(
+      BuildContext context, Position highlightPosition, Size parentSize);
 }
 
 /// A bubble slide with a position that depends on the highlight zone.
@@ -187,7 +200,8 @@ class RelativeBubbleSlideChild extends BubbleSlideChild {
         );
 
   @override
-  Position getPosition(BuildContext context, Position highlightPosition, Size parentSize) {
+  Position getPosition(
+      BuildContext context, Position highlightPosition, Size parentSize) {
     switch (direction) {
       case AxisDirection.up:
         return Position(
@@ -231,5 +245,7 @@ class AbsoluteBubbleSlideChild extends BubbleSlideChild {
         );
 
   @override
-  Position getPosition(BuildContext context, Position highlightPosition, Size parentSize) => positionCalculator(parentSize);
+  Position getPosition(
+          BuildContext context, Position highlightPosition, Size parentSize) =>
+      positionCalculator(parentSize);
 }
