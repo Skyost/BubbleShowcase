@@ -1,5 +1,8 @@
+import 'dart:async';
+
 import 'package:bubble_showcase/src/slide.dart';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 /// Contains some useful methods.
 class Utils {
@@ -84,4 +87,21 @@ class OverlayPainter extends CustomPainter {
   @override
   bool shouldRepaint(OverlayPainter oldOverlay) =>
       oldOverlay._position != _position;
+}
+
+Future<bool> readShowcaseStateFromSharedPreferences(
+  String showcaseId,
+  int showcaseVersion,
+) async {
+  final SharedPreferences preferences = await SharedPreferences.getInstance();
+  bool result = preferences.getBool('$showcaseId.$showcaseVersion');
+  return result == null || result;
+}
+
+FutureOr<void> setShowcaseStateToSharedPreferences(
+  String showcaseId,
+  int showcaseVersion,
+) async {
+  final preferences = await SharedPreferences.getInstance();
+  await preferences.setBool('${showcaseId}.${showcaseVersion}', false);
 }

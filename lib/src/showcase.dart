@@ -1,9 +1,11 @@
 library bubble_showcase;
 
+import 'dart:async';
+
+import 'package:bubble_showcase/bubble_showcase.dart';
 import 'package:bubble_showcase/src/slide.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 /// The BubbleShowcase main widget.
 class BubbleShowcase extends StatefulWidget {
@@ -28,6 +30,12 @@ class BubbleShowcase extends StatefulWidget {
   /// Whether to show a close button.
   final bool showCloseButton;
 
+  /// Checks if slide with given [id] and [version] should be visible.
+  final FutureOr<bool> Function(String id, int version) isSlideVisible;
+
+  /// Stores state of a slide with given [id] and [version]
+  final FutureOr<void> Function(String id, int version) hideSlide;
+
   /// Creates a new bubble showcase instance.
   BubbleShowcase({
     @required this.bubbleShowcaseId,
@@ -37,6 +45,8 @@ class BubbleShowcase extends StatefulWidget {
     this.child,
     this.counterText = ':i/:n',
     this.showCloseButton = true,
+    this.isSlideVisible = readShowcaseStateFromSharedPreferences,
+    this.hideSlide = setShowcaseStateToSharedPreferences,
   }) : assert(bubbleSlides.isNotEmpty);
 
   @override
@@ -47,10 +57,7 @@ class BubbleShowcase extends StatefulWidget {
     if (!doNotReopenOnClose) {
       return true;
     }
-    SharedPreferences preferences = await SharedPreferences.getInstance();
-    bool result =
-        preferences.getBool('$bubbleShowcaseId.$bubbleShowcaseVersion');
-    return result == null || result;
+    return isSlideVisible(bubbleShowcaseId, bubbleShowcaseVersion);
   }
 }
 
@@ -112,11 +119,10 @@ class _BubbleShowcaseState extends State<BubbleShowcase>
     if (_isFinished) {
       _currentSlideEntry = null;
       if (widget.doNotReopenOnClose) {
-        SharedPreferences.getInstance().then((preferences) {
-          preferences.setBool(
-              '${widget.bubbleShowcaseId}.${widget.bubbleShowcaseVersion}',
-              false);
-        });
+        widget.hideSlide(
+          widget.bubbleShowcaseId,
+          widget.bubbleShowcaseVersion,
+        );
       }
     } else {
       _currentSlideEntry = _createCurrentSlideEntry();

@@ -93,6 +93,8 @@ The showcase is where everything begins. Let's see the available options :
 * `child` The widget to display below the slides. It should be your app main widget.
 * `counterText` The current slide counter text. `:i` targets the current slide number and `:n` targets the maximum slide number.
 * `showCloseButton` Whether to show a little close button on the top left of the slide.
+* `isSlideVisible` Checks if given slide should be shown to the user.
+* `hideSlide` Mark given slide as hidden.
 
 ### The slides
 

@@ -1,3 +1,7 @@
+## [next]
+
+* Added callbacks to externalize showcase state.
+
 ## [0.2.0+4] - 2020-08-05
 
 * Updated README.
