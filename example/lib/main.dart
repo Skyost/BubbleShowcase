@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:bubble_showcase/bubble_showcase.dart';
 import 'package:flutter/material.dart';
 import 'package:speech_bubble/speech_bubble.dart';
@@ -26,6 +27,8 @@ class _BubbleShowcaseDemoWidget extends StatelessWidget {
   /// The first button global key.
   final GlobalKey _firstButtonKey = GlobalKey();
 
+  final StreamController<int> slideChangeController = StreamController();
+
   @override
   Widget build(BuildContext context) {
     TextStyle textStyle = Theme.of(context).textTheme.bodyText1.copyWith(
@@ -35,16 +38,19 @@ class _BubbleShowcaseDemoWidget extends StatelessWidget {
       bubbleShowcaseId: 'my_bubble_showcase',
       bubbleShowcaseVersion: 1,
       bubbleSlides: [
-        _firstSlide(textStyle),
+        _firstSlide(textStyle, slideChangeController),
         _secondSlide(textStyle),
         _thirdSlide(textStyle),
       ],
+      slideChangeStream: slideChangeController.stream,
       child: _BubbleShowcaseDemoChild(_titleKey, _firstButtonKey),
     );
   }
 
   /// Creates the first slide.
-  BubbleSlide _firstSlide(TextStyle textStyle) => RelativeBubbleSlide(
+  BubbleSlide _firstSlide(
+          TextStyle textStyle, StreamController<int> slideChangeController) =>
+      RelativeBubbleSlide(
         widgetKey: _titleKey,
         child: RelativeBubbleSlideChild(
           widget: Padding(
@@ -68,6 +74,12 @@ class _BubbleShowcaseDemoWidget extends StatelessWidget {
                     Text(
                       'This is my brand new title !',
                       style: textStyle,
+                    ),
+                    RaisedButton(
+                      child: Text('Next'),
+                      onPressed: () {
+                        slideChangeController.add(1);
+                      },
                     ),
                   ],
                 ),

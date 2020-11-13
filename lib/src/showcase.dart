@@ -1,5 +1,6 @@
 library bubble_showcase;
 
+import 'dart:async';
 import 'package:bubble_showcase/src/slide.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
@@ -28,12 +29,16 @@ class BubbleShowcase extends StatefulWidget {
   /// Whether to show a close button.
   final bool showCloseButton;
 
+  // Change slide stream
+  final Stream<int> slideChangeStream;
+
   /// Creates a new bubble showcase instance.
   BubbleShowcase({
     @required this.bubbleShowcaseId,
     @required this.bubbleShowcaseVersion,
     this.doNotReopenOnClose = false,
     @required this.bubbleSlides,
+    @required this.slideChangeStream,
     this.child,
     this.counterText = ':i/:n',
     this.showCloseButton = true,
@@ -63,6 +68,8 @@ class _BubbleShowcaseState extends State<BubbleShowcase>
   /// The current slide entry.
   OverlayEntry _currentSlideEntry;
 
+  // StreamSubscription slideChangeSubscription;
+
   @override
   void initState() {
     WidgetsBinding.instance.addPostFrameCallback((_) async {
@@ -75,6 +82,11 @@ class _BubbleShowcaseState extends State<BubbleShowcase>
     WidgetsBinding.instance.addObserver(this);
 
     super.initState();
+    widget.slideChangeStream.listen(
+      (position) {
+        _goToNextEntryOrClose(position);
+      },
+    );
   }
 
   @override
@@ -85,6 +97,9 @@ class _BubbleShowcaseState extends State<BubbleShowcase>
     _currentSlideEntry?.remove();
     WidgetsBinding.instance.removeObserver(this);
     super.dispose();
+    // if (slideChangeSubscription != null) {
+    //   slideChangeSubscription.cancel();
+    // }
   }
 
   @override
@@ -99,6 +114,20 @@ class _BubbleShowcaseState extends State<BubbleShowcase>
     });
   }
 
+  @override
+  void didUpdateWidget(BubbleShowcase old) {
+    super.didUpdateWidget(old);
+    // in case the stream instance changed, subscribe to the new one
+    if (widget.slideChangeStream != old.slideChangeStream) {
+      // if (slideChangeSubscription != null) {
+      //   slideChangeSubscription.cancel();
+      // }
+      widget.slideChangeStream.listen((position) {
+        _goToNextEntryOrClose(position);
+      });
+    }
+  }
+
   /// Returns whether the showcasing is finished.
   bool get _isFinished =>
       _currentSlideIndex == -1 ||
@@ -106,7 +135,6 @@ class _BubbleShowcaseState extends State<BubbleShowcase>
 
   /// Allows to go to the next entry (or to close the showcase if needed).
   void _goToNextEntryOrClose(int position) {
-    print('position: $position');
     _currentSlideIndex = position;
     _currentSlideEntry.remove();
 
@@ -126,14 +154,16 @@ class _BubbleShowcaseState extends State<BubbleShowcase>
   }
 
   /// Creates the current slide entry.
-  OverlayEntry _createCurrentSlideEntry() => OverlayEntry(
-        builder: (context) => widget.bubbleSlides[_currentSlideIndex].build(
-          context,
-          widget,
-          _currentSlideIndex,
-          (position) {
-            setState(() => _goToNextEntryOrClose(position));
-          },
-        ),
-      );
+  OverlayEntry _createCurrentSlideEntry() {
+    return OverlayEntry(
+      builder: (context) => widget.bubbleSlides[_currentSlideIndex].build(
+        context,
+        widget,
+        _currentSlideIndex,
+        (position) {
+          setState(() => _goToNextEntryOrClose(position));
+        },
+      ),
+    );
+  }
 }
