@@ -46,7 +46,7 @@ class _BubbleShowcaseDemoWidget extends StatelessWidget {
       child: _BubbleShowcaseDemoChild(_titleKey, _firstButtonKey),
       counterText: null,
       showCloseButton: false,
-      enabledNextOnClickOverlay: false,
+      enabledNextOnClickOverlay: true,
     );
   }
 
@@ -63,26 +63,48 @@ class _BubbleShowcaseDemoWidget extends StatelessWidget {
               color: Colors.blue,
               child: Padding(
                 padding: const EdgeInsets.all(10),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisSize: MainAxisSize.min,
+                child: Stack(
                   children: [
-                    Text(
-                      'That\'s cool !',
-                      style: textStyle.copyWith(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Text(
+                          'That\'s cool !',
+                          style: textStyle.copyWith(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        Text(
+                          'This is my brand new title !',
+                          style: textStyle,
+                        ),
+                        Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            GestureDetector(
+                              onTap: () => slideChangeController.add(3),
+                              child: Text('skip'),
+                            ),
+                            Container(
+                              margin: EdgeInsets.only(left: 16.0),
+                              child: RaisedButton(
+                                child: Text('Next'),
+                                onPressed: () {
+                                  slideChangeController.add(1);
+                                },
+                              ),
+                            )
+                          ],
+                        ),
+                      ],
+                    ),
+                    Positioned.fill(
+                      child: Align(
+                        alignment: Alignment.topRight,
+                        child: Text('1/3'),
                       ),
-                    ),
-                    Text(
-                      'This is my brand new title !',
-                      style: textStyle,
-                    ),
-                    RaisedButton(
-                      child: Text('Next'),
-                      onPressed: () {
-                        slideChangeController.add(1);
-                      },
                     ),
                   ],
                 ),
