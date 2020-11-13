@@ -106,6 +106,7 @@ class _BubbleShowcaseState extends State<BubbleShowcase>
 
   /// Allows to go to the next entry (or to close the showcase if needed).
   void _goToNextEntryOrClose(int position) {
+    print('position: $position');
     _currentSlideIndex = position;
     _currentSlideEntry.remove();
 
