@@ -30,8 +30,12 @@ abstract class BubbleSlide {
   });
 
   /// Builds the whole slide widget.
-  Widget build(BuildContext context, BubbleShowcase bubbleShowcase,
-      int currentSlideIndex, void Function(int) goToSlide) {
+  Widget build(
+    BuildContext context,
+    BubbleShowcase bubbleShowcase,
+    int currentSlideIndex,
+    void Function(int) goToSlide,
+  ) {
     Position highlightPosition =
         getHighlightPosition(context, bubbleShowcase, currentSlideIndex);
     List<Widget> children = [
@@ -83,7 +87,9 @@ abstract class BubbleSlide {
     }
 
     return GestureDetector(
-      onTap: () => goToSlide(currentSlideIndex + 1),
+      onTap: () => bubbleShowcase.enabledNextOnClickOverlay
+          ? goToSlide(currentSlideIndex + 1)
+          : null,
       child: Stack(
         children: children,
       ),

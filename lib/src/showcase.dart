@@ -29,6 +29,9 @@ class BubbleShowcase extends StatefulWidget {
   /// Whether to show a close button.
   final bool showCloseButton;
 
+  /// Whether to enable click on overlay to go to next slide
+  final bool enabledNextOnClickOverlay;
+
   // Change slide stream
   final Stream<int> slideChangeStream;
 
@@ -42,6 +45,7 @@ class BubbleShowcase extends StatefulWidget {
     this.child,
     this.counterText = ':i/:n',
     this.showCloseButton = true,
+    this.enabledNextOnClickOverlay = true,
   }) : assert(bubbleSlides.isNotEmpty);
 
   @override

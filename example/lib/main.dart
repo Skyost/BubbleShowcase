@@ -44,6 +44,9 @@ class _BubbleShowcaseDemoWidget extends StatelessWidget {
       ],
       slideChangeStream: slideChangeController.stream,
       child: _BubbleShowcaseDemoChild(_titleKey, _firstButtonKey),
+      counterText: null,
+      showCloseButton: false,
+      enabledNextOnClickOverlay: false,
     );
   }
 
