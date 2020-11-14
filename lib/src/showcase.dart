@@ -6,6 +6,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+enum SlideControllerAction {
+  next,
+  previous,
+  close,
+}
+
 /// The BubbleShowcase main widget.
 class BubbleShowcase extends StatefulWidget {
   /// This showcase identifier. Must be unique across the app.
@@ -35,6 +41,9 @@ class BubbleShowcase extends StatefulWidget {
   /// Trigger this stream to change slide by position number
   final Stream<int> slideNumberStream;
 
+  /// Trigger to control slide
+  final Stream<SlideControllerAction> slideActionStream;
+
   /// Creates a new bubble showcase instance.
   BubbleShowcase({
     @required this.bubbleShowcaseId,
@@ -42,6 +51,7 @@ class BubbleShowcase extends StatefulWidget {
     this.doNotReopenOnClose = false,
     @required this.bubbleSlides,
     this.slideNumberStream,
+    this.slideActionStream,
     this.child,
     this.counterText = ':i/:n',
     this.showCloseButton = true,
@@ -73,6 +83,7 @@ class _BubbleShowcaseState extends State<BubbleShowcase>
   OverlayEntry _currentSlideEntry;
 
   // StreamSubscription slideNumberSubscription;
+  // StreamSubscription slideActionSubscription;
 
   @override
   void initState() {
@@ -93,6 +104,11 @@ class _BubbleShowcaseState extends State<BubbleShowcase>
         },
       );
     }
+    if (widget.slideActionStream != null) {
+      widget.slideActionStream.listen((action) {
+        _slideActionHandler(action);
+      });
+    }
   }
 
   @override
@@ -105,6 +121,9 @@ class _BubbleShowcaseState extends State<BubbleShowcase>
     super.dispose();
     // if (slideNumberSubscription != null) {
     //   slideNumberSubscription.cancel();
+    // }
+    // if (slideActionSubscription != null) {
+    //   slideActionSubscription.cancel();
     // }
   }
 
@@ -131,6 +150,16 @@ class _BubbleShowcaseState extends State<BubbleShowcase>
         // }
         widget.slideNumberStream.listen((position) {
           _goToNextEntryOrClose(position);
+        });
+      }
+    }
+    if (widget.slideActionStream != null) {
+      if (widget.slideActionStream != old.slideActionStream) {
+        // if (slideActionSubscription != null) {
+        //   slideActionSubscription.cancel();
+        // }
+        widget.slideActionStream.listen((action) {
+          _slideActionHandler(action);
         });
       }
     }
@@ -162,6 +191,23 @@ class _BubbleShowcaseState extends State<BubbleShowcase>
     } else {
       _currentSlideEntry = _createCurrentSlideEntry();
       Overlay.of(context).insert(_currentSlideEntry);
+    }
+  }
+
+  void _slideActionHandler(SlideControllerAction action) {
+    switch (action) {
+      case SlideControllerAction.next:
+        _goToNextEntryOrClose(_currentSlideIndex + 1);
+        break;
+      case SlideControllerAction.previous:
+        /// Prevent close when invoke previous on first slide
+        if (_currentSlideIndex != 0) {
+          _goToNextEntryOrClose(_currentSlideIndex - 1);
+        }
+        break;
+      case SlideControllerAction.close:
+        _goToNextEntryOrClose(-1);
+        break;
     }
   }
 

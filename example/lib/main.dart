@@ -28,6 +28,8 @@ class _BubbleShowcaseDemoWidget extends StatelessWidget {
   final GlobalKey _firstButtonKey = GlobalKey();
 
   final StreamController<int> slideNumberConroller = StreamController();
+  final StreamController<SlideControllerAction> slideActionConroller =
+      StreamController();
 
   @override
   Widget build(BuildContext context) {
@@ -43,6 +45,7 @@ class _BubbleShowcaseDemoWidget extends StatelessWidget {
         _thirdSlide(textStyle),
       ],
       slideNumberStream: slideNumberConroller.stream,
+      slideActionStream: slideActionConroller.stream,
       child: _BubbleShowcaseDemoChild(_titleKey, _firstButtonKey),
       counterText: null,
       showCloseButton: false,
@@ -130,9 +133,35 @@ class _BubbleShowcaseDemoWidget extends StatelessWidget {
               color: Colors.teal,
               child: Padding(
                 padding: const EdgeInsets.all(10),
-                child: Text(
-                  'Look at me pointing absolutely nothing.\n(Or maybe that\'s an hidden navigation bar !)',
-                  style: textStyle,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
+                      'Look at me pointing absolutely nothing.\n(Or maybe that\'s an hidden navigation bar !)',
+                      style: textStyle,
+                    ),
+                    Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        GestureDetector(
+                          onTap: () => slideActionConroller
+                              .add(SlideControllerAction.previous),
+                          child: Text('previous'),
+                        ),
+                        Container(
+                          margin: EdgeInsets.only(left: 16.0),
+                          child: RaisedButton(
+                            child: Text('Next'),
+                            onPressed: () {
+                              slideActionConroller
+                                  .add(SlideControllerAction.next);
+                            },
+                          ),
+                        )
+                      ],
+                    ),
+                  ],
                 ),
               ),
             ),
@@ -155,21 +184,40 @@ class _BubbleShowcaseDemoWidget extends StatelessWidget {
               color: Colors.purple,
               child: Padding(
                 padding: const EdgeInsets.all(10),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
+                child: Column(
                   children: [
-                    Padding(
-                      padding: const EdgeInsets.only(right: 5),
-                      child: Icon(
-                        Icons.info_outline,
-                        color: Colors.white,
-                      ),
+                    Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Padding(
+                          padding: const EdgeInsets.only(right: 5),
+                          child: Icon(
+                            Icons.info_outline,
+                            color: Colors.white,
+                          ),
+                        ),
+                        Expanded(
+                          child: Text(
+                            'As said, this button is new.\nOh, and this one is oval by the way.',
+                            style: textStyle,
+                          ),
+                        ),
+                      ],
                     ),
-                    Expanded(
-                      child: Text(
-                        'As said, this button is new.\nOh, and this one is oval by the way.',
-                        style: textStyle,
-                      ),
+                    Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Container(
+                          margin: EdgeInsets.only(left: 16.0),
+                          child: RaisedButton(
+                            child: Text('Done'),
+                            onPressed: () {
+                              slideActionConroller
+                                  .add(SlideControllerAction.close);
+                            },
+                          ),
+                        )
+                      ],
                     ),
                   ],
                 ),
