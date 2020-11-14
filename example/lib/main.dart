@@ -175,6 +175,8 @@ class _BubbleShowcaseDemoWidget extends StatelessWidget {
           spreadRadius: 15,
         ),
         child: RelativeBubbleSlideChild(
+          extraWidthLeft: 50.0,
+          extraWidthRight: 50.0,
           widget: Padding(
             padding: const EdgeInsets.only(top: 23),
             child: SpeechBubble(
@@ -205,6 +207,11 @@ class _BubbleShowcaseDemoWidget extends StatelessWidget {
                     Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
+                        GestureDetector(
+                          onTap: () => slideActionConroller
+                              .add(SlideControllerAction.previous),
+                          child: Text('previous'),
+                        ),
                         Container(
                           margin: EdgeInsets.only(left: 16.0),
                           child: RaisedButton(

@@ -196,11 +196,19 @@ abstract class BubbleSlideChild {
 class RelativeBubbleSlideChild extends BubbleSlideChild {
   /// The child direction.
   final AxisDirection direction;
+  final double extraWidthRight;
+  final double extraWidthLeft;
+  final double extraHeightTop;
+  final double extraHeightBottom;
 
   /// Creates a new relative bubble slide child instance.
   const RelativeBubbleSlideChild({
     Widget widget,
     this.direction = AxisDirection.down,
+    this.extraWidthRight = 0.0,
+    this.extraWidthLeft = 0.0,
+    this.extraHeightTop = 0.0,
+    this.extraHeightBottom = 0.0,
   }) : super(
           widget: widget,
         );
@@ -211,27 +219,29 @@ class RelativeBubbleSlideChild extends BubbleSlideChild {
     switch (direction) {
       case AxisDirection.up:
         return Position(
-          right: parentSize.width - highlightPosition.right,
+          right: parentSize.width - highlightPosition.right - extraWidthRight,
           bottom: parentSize.height - highlightPosition.top,
-          left: highlightPosition.left,
+          left: highlightPosition.left - extraWidthLeft,
         );
       case AxisDirection.right:
         return Position(
-          top: highlightPosition.top,
-          bottom: parentSize.height - highlightPosition.bottom,
+          top: highlightPosition.top - extraHeightTop,
+          bottom:
+              parentSize.height - highlightPosition.bottom - extraHeightBottom,
           right: parentSize.width - highlightPosition.left,
         );
       case AxisDirection.left:
         return Position(
-          top: highlightPosition.top,
-          bottom: parentSize.height - highlightPosition.bottom,
+          top: highlightPosition.top - extraHeightTop,
+          bottom:
+              parentSize.height - highlightPosition.bottom - extraHeightBottom,
           left: highlightPosition.right,
         );
       default:
         return Position(
           top: highlightPosition.bottom,
-          right: parentSize.width - highlightPosition.right,
-          left: highlightPosition.left,
+          right: parentSize.width - highlightPosition.right - extraWidthRight,
+          left: highlightPosition.left - extraWidthLeft,
         );
     }
   }
