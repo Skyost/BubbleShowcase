@@ -32,8 +32,8 @@ class BubbleShowcase extends StatefulWidget {
   /// Whether to enable click on overlay to go to next slide
   final bool enabledNextOnClickOverlay;
 
-  // Change slide stream
-  final Stream<int> slideChangeStream;
+  /// Trigger this stream to change slide by position number
+  final Stream<int> slideNumberStream;
 
   /// Creates a new bubble showcase instance.
   BubbleShowcase({
@@ -41,7 +41,7 @@ class BubbleShowcase extends StatefulWidget {
     @required this.bubbleShowcaseVersion,
     this.doNotReopenOnClose = false,
     @required this.bubbleSlides,
-    @required this.slideChangeStream,
+    @required this.slideNumberStream,
     this.child,
     this.counterText = ':i/:n',
     this.showCloseButton = true,
@@ -72,7 +72,7 @@ class _BubbleShowcaseState extends State<BubbleShowcase>
   /// The current slide entry.
   OverlayEntry _currentSlideEntry;
 
-  // StreamSubscription slideChangeSubscription;
+  // StreamSubscription slideNumberSubscription;
 
   @override
   void initState() {
@@ -86,7 +86,7 @@ class _BubbleShowcaseState extends State<BubbleShowcase>
     WidgetsBinding.instance.addObserver(this);
 
     super.initState();
-    widget.slideChangeStream.listen(
+    widget.slideNumberStream.listen(
       (position) {
         _goToNextEntryOrClose(position);
       },
@@ -101,8 +101,8 @@ class _BubbleShowcaseState extends State<BubbleShowcase>
     _currentSlideEntry?.remove();
     WidgetsBinding.instance.removeObserver(this);
     super.dispose();
-    // if (slideChangeSubscription != null) {
-    //   slideChangeSubscription.cancel();
+    // if (slideNumberSubscription != null) {
+    //   slideNumberSubscription.cancel();
     // }
   }
 
@@ -122,11 +122,11 @@ class _BubbleShowcaseState extends State<BubbleShowcase>
   void didUpdateWidget(BubbleShowcase old) {
     super.didUpdateWidget(old);
     // in case the stream instance changed, subscribe to the new one
-    if (widget.slideChangeStream != old.slideChangeStream) {
-      // if (slideChangeSubscription != null) {
-      //   slideChangeSubscription.cancel();
+    if (widget.slideNumberStream != old.slideNumberStream) {
+      // if (slideNumberSubscription != null) {
+      //   slideNumberSubscription.cancel();
       // }
-      widget.slideChangeStream.listen((position) {
+      widget.slideNumberStream.listen((position) {
         _goToNextEntryOrClose(position);
       });
     }
@@ -135,10 +135,14 @@ class _BubbleShowcaseState extends State<BubbleShowcase>
   /// Returns whether the showcasing is finished.
   bool get _isFinished =>
       _currentSlideIndex == -1 ||
-      _currentSlideIndex == widget.bubbleSlides.length;
+      _currentSlideIndex >= widget.bubbleSlides.length;
 
   /// Allows to go to the next entry (or to close the showcase if needed).
   void _goToNextEntryOrClose(int position) {
+    if (position < -1) {
+      return;
+    }
+
     _currentSlideIndex = position;
     _currentSlideEntry.remove();
 

@@ -27,7 +27,7 @@ class _BubbleShowcaseDemoWidget extends StatelessWidget {
   /// The first button global key.
   final GlobalKey _firstButtonKey = GlobalKey();
 
-  final StreamController<int> slideChangeController = StreamController();
+  final StreamController<int> slideNumberConroller = StreamController();
 
   @override
   Widget build(BuildContext context) {
@@ -38,11 +38,11 @@ class _BubbleShowcaseDemoWidget extends StatelessWidget {
       bubbleShowcaseId: 'my_bubble_showcase',
       bubbleShowcaseVersion: 1,
       bubbleSlides: [
-        _firstSlide(textStyle, slideChangeController),
+        _firstSlide(textStyle, slideNumberConroller),
         _secondSlide(textStyle),
         _thirdSlide(textStyle),
       ],
-      slideChangeStream: slideChangeController.stream,
+      slideNumberStream: slideNumberConroller.stream,
       child: _BubbleShowcaseDemoChild(_titleKey, _firstButtonKey),
       counterText: null,
       showCloseButton: false,
@@ -52,7 +52,7 @@ class _BubbleShowcaseDemoWidget extends StatelessWidget {
 
   /// Creates the first slide.
   BubbleSlide _firstSlide(
-          TextStyle textStyle, StreamController<int> slideChangeController) =>
+          TextStyle textStyle, StreamController<int> slideNumberConroller) =>
       RelativeBubbleSlide(
         widgetKey: _titleKey,
         child: RelativeBubbleSlideChild(
@@ -84,7 +84,7 @@ class _BubbleShowcaseDemoWidget extends StatelessWidget {
                           mainAxisSize: MainAxisSize.min,
                           children: [
                             GestureDetector(
-                              onTap: () => slideChangeController.add(3),
+                              onTap: () => slideNumberConroller.add(4),
                               child: Text('skip'),
                             ),
                             Container(
@@ -92,7 +92,7 @@ class _BubbleShowcaseDemoWidget extends StatelessWidget {
                               child: RaisedButton(
                                 child: Text('Next'),
                                 onPressed: () {
-                                  slideChangeController.add(1);
+                                  slideNumberConroller.add(1);
                                 },
                               ),
                             )
