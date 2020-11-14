@@ -40,7 +40,7 @@ class _BubbleShowcaseDemoWidget extends StatelessWidget {
       bubbleShowcaseId: 'my_bubble_showcase',
       bubbleShowcaseVersion: 1,
       bubbleSlides: [
-        _firstSlide(textStyle, slideNumberConroller),
+        _firstSlide(textStyle),
         _secondSlide(textStyle),
         _thirdSlide(textStyle),
       ],
@@ -54,9 +54,7 @@ class _BubbleShowcaseDemoWidget extends StatelessWidget {
   }
 
   /// Creates the first slide.
-  BubbleSlide _firstSlide(
-          TextStyle textStyle, StreamController<int> slideNumberConroller) =>
-      RelativeBubbleSlide(
+  BubbleSlide _firstSlide(TextStyle textStyle) => RelativeBubbleSlide(
         widgetKey: _titleKey,
         child: RelativeBubbleSlideChild(
           widget: Padding(
@@ -269,7 +267,7 @@ class _BubbleShowcaseDemoChild extends StatelessWidget {
               child: const Text(
                   'This button is old, please don\'t pay attention.'),
               onPressed: () {},
-            )
+            ),
           ],
         ),
       );
