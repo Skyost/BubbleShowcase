@@ -87,7 +87,7 @@ abstract class BubbleSlide {
     }
 
     return GestureDetector(
-      onTap: () => bubbleShowcase.enabledNextOnClickOverlay
+      onTap: () => bubbleShowcase.enabledClickOnOverlayToNextSlide
           ? goToSlide(currentSlideIndex + 1)
           : null,
       child: Stack(

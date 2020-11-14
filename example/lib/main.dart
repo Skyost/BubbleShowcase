@@ -49,7 +49,7 @@ class _BubbleShowcaseDemoWidget extends StatelessWidget {
       child: _BubbleShowcaseDemoChild(_titleKey, _firstButtonKey),
       counterText: null,
       showCloseButton: false,
-      enabledNextOnClickOverlay: true,
+      enabledClickOnOverlayToNextSlide: false,
     );
   }
 
@@ -96,7 +96,7 @@ class _BubbleShowcaseDemoWidget extends StatelessWidget {
                                   slideNumberConroller.add(1);
                                 },
                               ),
-                            )
+                            ),
                           ],
                         ),
                       ],

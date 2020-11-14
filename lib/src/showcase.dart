@@ -36,7 +36,7 @@ class BubbleShowcase extends StatefulWidget {
   final bool showCloseButton;
 
   /// Whether to enable click on overlay to go to next slide
-  final bool enabledNextOnClickOverlay;
+  final bool enabledClickOnOverlayToNextSlide;
 
   /// Trigger this stream to change slide by position number
   final Stream<int> slideNumberStream;
@@ -50,12 +50,12 @@ class BubbleShowcase extends StatefulWidget {
     @required this.bubbleShowcaseVersion,
     this.doNotReopenOnClose = false,
     @required this.bubbleSlides,
-    this.slideNumberStream,
-    this.slideActionStream,
     this.child,
     this.counterText = ':i/:n',
     this.showCloseButton = true,
-    this.enabledNextOnClickOverlay = true,
+    this.enabledClickOnOverlayToNextSlide = true,
+    this.slideNumberStream,
+    this.slideActionStream,
   }) : assert(bubbleSlides.isNotEmpty);
 
   @override
@@ -99,7 +99,7 @@ class _BubbleShowcaseState extends State<BubbleShowcase>
     super.initState();
     if (widget.slideNumberStream != null) {
       widget.slideNumberStream.listen(
-            (position) {
+        (position) {
           _goToNextEntryOrClose(position);
         },
       );
@@ -200,6 +200,7 @@ class _BubbleShowcaseState extends State<BubbleShowcase>
         _goToNextEntryOrClose(_currentSlideIndex + 1);
         break;
       case SlideControllerAction.previous:
+
         /// Prevent close when invoke previous on first slide
         if (_currentSlideIndex != 0) {
           _goToNextEntryOrClose(_currentSlideIndex - 1);
