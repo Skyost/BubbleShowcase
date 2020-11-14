@@ -88,11 +88,85 @@ The showcase is where everything begins. Let's see the available options :
 
 * `bubbleShowcaseId` The showcase identifier. Must be unique across the app as it is used as a saving mean; for instance when the showcase should not be reopened (**required**).
 * `bubbleShowcaseVersion` The showcase version. Increase it when you update the showcase, this allows to redisplay the it to the user if `doNotReopenOnClose` is set to `true` (**required**).
-* `doNotReopenOnClose` Whether this showcase should be reopened once closed.
+* `doNotReopenOnClose` Whether this showcase should be reopened once closed. (default to `false`)
 * `bubbleSlides` The slides to display (**required** & **must not be empty**).
 * `child` The widget to display below the slides. It should be your app main widget.
-* `counterText` The current slide counter text. `:i` targets the current slide number and `:n` targets the maximum slide number.
-* `showCloseButton` Whether to show a little close button on the top left of the slide.
+* `counterText` The current slide counter text. `:i` targets the current slide number and `:n` targets the maximum slide number. You can pass `null` to disable this.
+* `showCloseButton` Whether to show a little close button on the top left of the slide. (default to `true`)
+* `enabledClickOnOverlayToNextSlide` Whether to enable click on overlay to go to next slide. (default to `true`)
+* `slideNumberStream` Trigger this to go to targeted slide. It is invoked by `Stream<int>`. If receiving input is over length of slides or less, the showcase is finished.  While providing position number less than -1, the showcase will stand still.
+* `slideActionStream` Trigger this to control slide to go `next`, back to `previous` or `close`. You can use StreamController to control slide like this example:
+
+```dart
+final StreamController<SlideControllerAction> slideActionConroller = StreamController();
+
+BubbleShowcase(
+  bubbleShowcaseId: 'my_bubble_showcase',
+  bubbleShowcaseVersion: 2,
+  bubbleSlides: [
+    AbsoluteBubbleSlide(
+      positionCalculator: (size) => Position(
+        top: 0,
+        right: 0,
+        bottom: 0,
+        left: 0,
+      ),
+      child: AbsoluteBubbleSlideChild(
+        positionCalculator: (size) => Position(
+          top: 0,
+          left: 0,
+        ),
+        widget: SpeechBubble(
+          nipLocation: NipLocation.LEFT,
+          color: Colors.blue,
+          child: Padding(
+            padding: EdgeInsets.all(10),
+            child: Column(
+              children: [
+                Text(
+                  'This is the top left corner of your app.',
+                  style: TextStyle(color: Colors.white),
+                ),
+                Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    GestureDetector(
+                      onTap: () => slideActionConroller
+                          .add(SlideControllerAction.previous),
+                      child: Text('previous'),
+                    ),
+                    Container(
+                      margin: EdgeInsets.only(left: 16.0),
+                      child: RaisedButton(
+                        child: Text('Next'),
+                        onPressed: () {
+                          slideActionConroller
+                              .add(SlideControllerAction.next);
+                        },
+                      ),
+                    ),
+                    Container(
+                      margin: EdgeInsets.only(left: 16.0),
+                      child: RaisedButton(
+                        child: Text('Done'),
+                        onPressed: () {
+                          slideActionConroller
+                              .add(SlideControllerAction.close);
+                        },
+                      ),
+                    )
+                  ],
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    ),
+  ],
+  child: MyMainWidget(),
+);
+```
 
 ### The slides
 
@@ -118,7 +192,7 @@ The same positioning system is also available for children :
 | Position | Class name                 | Use case                                                                                                                  | Specific options                                                                    |
 |----------|----------------------------|---------------------------------------------------------------------------------------------------------------------------|-------------------------------------------------------------------------------------|
 | Absolute | `AbsoluteBubbleSlideChild` | You want to position the child according to a _x_, _y_ position on the screen and not the highlighted part of the screen. | `positionCalculator` The function that calculates the child position on the screen. |
-| Relative | `RelativeBubbleSlideChild` | You want to position the child according to the highlighted zone.                                                         | `direction` Where to position the child compared to the highlighted zone.           |
+| Relative | `RelativeBubbleSlideChild` | You want to position the child according to the highlighted zone.                                                         | <ul><li>`direction` Where to position the child compared to the highlighted zone.</li><li>`extraWidthRight` Additional width to the right. Working only with direction up & down</li><li>`extraWidthLeft` Additional width to the left. Working only with direction up & down</li><li>`extraHeightTop` Additional height to the top. Working only with direction left & right</li><li>`extraHeightBottom` Additional height to the bottom. Working only with direction left & right</li></ul>|
 
 All children have these options in common :
 

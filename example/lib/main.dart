@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:bubble_showcase/bubble_showcase.dart';
 import 'package:flutter/material.dart';
 import 'package:speech_bubble/speech_bubble.dart';
@@ -19,7 +20,6 @@ class _BubbleShowcaseDemoApp extends StatelessWidget {
       );
 }
 
-/// The main demo widget.
 class _BubbleShowcaseDemoWidget extends StatelessWidget {
   /// The title text global key.
   final GlobalKey _titleKey = GlobalKey();
@@ -27,9 +27,13 @@ class _BubbleShowcaseDemoWidget extends StatelessWidget {
   /// The first button global key.
   final GlobalKey _firstButtonKey = GlobalKey();
 
+  final StreamController<int> slideNumberConroller = StreamController();
+  final StreamController<SlideControllerAction> slideActionConroller =
+      StreamController();
+
   @override
   Widget build(BuildContext context) {
-    TextStyle textStyle = Theme.of(context).textTheme.body1.copyWith(
+    TextStyle textStyle = Theme.of(context).textTheme.bodyText1.copyWith(
           color: Colors.white,
         );
     return BubbleShowcase(
@@ -40,7 +44,12 @@ class _BubbleShowcaseDemoWidget extends StatelessWidget {
         _secondSlide(textStyle),
         _thirdSlide(textStyle),
       ],
+      slideNumberStream: slideNumberConroller.stream,
+      slideActionStream: slideActionConroller.stream,
       child: _BubbleShowcaseDemoChild(_titleKey, _firstButtonKey),
+      counterText: null,
+      showCloseButton: false,
+      enabledClickOnOverlayToNextSlide: false,
     );
   }
 
@@ -55,20 +64,48 @@ class _BubbleShowcaseDemoWidget extends StatelessWidget {
               color: Colors.blue,
               child: Padding(
                 padding: const EdgeInsets.all(10),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisSize: MainAxisSize.min,
+                child: Stack(
                   children: [
-                    Text(
-                      'That\'s cool !',
-                      style: textStyle.copyWith(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                      ),
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Text(
+                          'That\'s cool !',
+                          style: textStyle.copyWith(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        Text(
+                          'This is my brand new title !',
+                          style: textStyle,
+                        ),
+                        Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            GestureDetector(
+                              onTap: () => slideNumberConroller.add(4),
+                              child: Text('skip'),
+                            ),
+                            Container(
+                              margin: EdgeInsets.only(left: 16.0),
+                              child: RaisedButton(
+                                child: Text('Next'),
+                                onPressed: () {
+                                  slideNumberConroller.add(1);
+                                },
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
                     ),
-                    Text(
-                      'This is my brand new title !',
-                      style: textStyle,
+                    Positioned.fill(
+                      child: Align(
+                        alignment: Alignment.topRight,
+                        child: Text('1/3'),
+                      ),
                     ),
                   ],
                 ),
@@ -94,9 +131,35 @@ class _BubbleShowcaseDemoWidget extends StatelessWidget {
               color: Colors.teal,
               child: Padding(
                 padding: const EdgeInsets.all(10),
-                child: Text(
-                  'Look at me pointing absolutely nothing.\n(Or maybe that\'s an hidden navigation bar !)',
-                  style: textStyle,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
+                      'Look at me pointing absolutely nothing.\n(Or maybe that\'s an hidden navigation bar !)',
+                      style: textStyle,
+                    ),
+                    Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        GestureDetector(
+                          onTap: () => slideActionConroller
+                              .add(SlideControllerAction.previous),
+                          child: Text('previous'),
+                        ),
+                        Container(
+                          margin: EdgeInsets.only(left: 16.0),
+                          child: RaisedButton(
+                            child: Text('Next'),
+                            onPressed: () {
+                              slideActionConroller
+                                  .add(SlideControllerAction.next);
+                            },
+                          ),
+                        )
+                      ],
+                    ),
+                  ],
                 ),
               ),
             ),
@@ -112,6 +175,8 @@ class _BubbleShowcaseDemoWidget extends StatelessWidget {
           spreadRadius: 15,
         ),
         child: RelativeBubbleSlideChild(
+          extraWidthLeft: 50.0,
+          extraWidthRight: 50.0,
           widget: Padding(
             padding: const EdgeInsets.only(top: 23),
             child: SpeechBubble(
@@ -119,21 +184,45 @@ class _BubbleShowcaseDemoWidget extends StatelessWidget {
               color: Colors.purple,
               child: Padding(
                 padding: const EdgeInsets.all(10),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
+                child: Column(
                   children: [
-                    Padding(
-                      padding: const EdgeInsets.only(right: 5),
-                      child: Icon(
-                        Icons.info_outline,
-                        color: Colors.white,
-                      ),
+                    Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Padding(
+                          padding: const EdgeInsets.only(right: 5),
+                          child: Icon(
+                            Icons.info_outline,
+                            color: Colors.white,
+                          ),
+                        ),
+                        Expanded(
+                          child: Text(
+                            'As said, this button is new.\nOh, and this one is oval by the way.',
+                            style: textStyle,
+                          ),
+                        ),
+                      ],
                     ),
-                    Expanded(
-                      child: Text(
-                        'As said, this button is new.\nOh, and this one is oval by the way.',
-                        style: textStyle,
-                      ),
+                    Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        GestureDetector(
+                          onTap: () => slideActionConroller
+                              .add(SlideControllerAction.previous),
+                          child: Text('previous'),
+                        ),
+                        Container(
+                          margin: EdgeInsets.only(left: 16.0),
+                          child: RaisedButton(
+                            child: Text('Done'),
+                            onPressed: () {
+                              slideActionConroller
+                                  .add(SlideControllerAction.close);
+                            },
+                          ),
+                        )
+                      ],
                     ),
                   ],
                 ),
@@ -182,9 +271,10 @@ class _BubbleShowcaseDemoChild extends StatelessWidget {
               ),
             ),
             RaisedButton(
-              child: const Text('This button is old, please don\'t pay attention.'),
+              child: const Text(
+                  'This button is old, please don\'t pay attention.'),
               onPressed: () {},
-            )
+            ),
           ],
         ),
       );

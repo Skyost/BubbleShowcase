@@ -2,19 +2,21 @@ name: bubble_showcase_example
 description: Demonstrates how to use the bubble_showcase plugin.
 publish_to: 'none'
 
+version: 1.0.0+1
+
 environment:
-  sdk: ">=2.1.0 <3.0.0"
+  sdk: ">=2.7.0 <3.0.0"
 
 dependencies:
+  bubble_showcase:
+    path: ../
   flutter:
     sdk: flutter
+  speech_bubble: ^0.0.7
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
-  bubble_showcase:
-    path: ../
-  speech_bubble: ^0.0.6
 
 flutter:
   uses-material-design: true
