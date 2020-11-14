@@ -41,7 +41,7 @@ class BubbleShowcase extends StatefulWidget {
     @required this.bubbleShowcaseVersion,
     this.doNotReopenOnClose = false,
     @required this.bubbleSlides,
-    @required this.slideNumberStream,
+    this.slideNumberStream,
     this.child,
     this.counterText = ':i/:n',
     this.showCloseButton = true,
@@ -86,11 +86,13 @@ class _BubbleShowcaseState extends State<BubbleShowcase>
     WidgetsBinding.instance.addObserver(this);
 
     super.initState();
-    widget.slideNumberStream.listen(
-      (position) {
-        _goToNextEntryOrClose(position);
-      },
-    );
+    if (widget.slideNumberStream != null) {
+      widget.slideNumberStream.listen(
+            (position) {
+          _goToNextEntryOrClose(position);
+        },
+      );
+    }
   }
 
   @override
@@ -122,13 +124,15 @@ class _BubbleShowcaseState extends State<BubbleShowcase>
   void didUpdateWidget(BubbleShowcase old) {
     super.didUpdateWidget(old);
     // in case the stream instance changed, subscribe to the new one
-    if (widget.slideNumberStream != old.slideNumberStream) {
-      // if (slideNumberSubscription != null) {
-      //   slideNumberSubscription.cancel();
-      // }
-      widget.slideNumberStream.listen((position) {
-        _goToNextEntryOrClose(position);
-      });
+    if (widget.slideNumberStream != null) {
+      if (widget.slideNumberStream != old.slideNumberStream) {
+        // if (slideNumberSubscription != null) {
+        //   slideNumberSubscription.cancel();
+        // }
+        widget.slideNumberStream.listen((position) {
+          _goToNextEntryOrClose(position);
+        });
+      }
     }
   }
 
