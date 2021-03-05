@@ -36,14 +36,12 @@ class RoundedRectangle extends Shape {
   /// Creates a new rounded rectangle shape instance.
   const RoundedRectangle({
     this.spreadRadius = 0,
-    this.radius,
+    required this.radius,
   });
 
   @override
   void drawOnCanvas(Canvas canvas, Rect rectangle, Paint paint) {
-    canvas.drawRRect(
-        RRect.fromRectAndRadius(rectangle.inflate(spreadRadius), radius),
-        paint);
+    canvas.drawRRect(RRect.fromRectAndRadius(rectangle.inflate(spreadRadius), radius), paint);
   }
 }
 

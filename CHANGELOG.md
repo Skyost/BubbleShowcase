@@ -1,3 +1,8 @@
+## [1.0.0] - 2021-03-05
+
+* Migrated to null safety.
+* Added some callbacks.
+
 ## [0.2.0+4] - 2020-08-05
 
 * Updated README.

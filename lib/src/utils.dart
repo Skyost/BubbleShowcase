@@ -23,23 +23,17 @@ class Position {
 
   /// Creates a new position instance.
   const Position({
-    this.top,
-    this.right,
-    this.bottom,
-    this.left,
+    this.top = 0,
+    this.right = 0,
+    this.bottom = 0,
+    this.left = 0,
   });
 
   @override
-  String toString() =>
-      'Position(top: $top, right: $right, bottom: $bottom, left: $left)';
+  String toString() => 'Position(top: $top, right: $right, bottom: $bottom, left: $left)';
 
   @override
-  bool operator ==(Object other) =>
-      other is Position &&
-      top == other.top &&
-      right == other.right &&
-      bottom == other.bottom &&
-      left == other.left;
+  bool operator ==(Object other) => other is Position && top == other.top && right == other.right && bottom == other.bottom && left == other.left;
 
   @override
   int get hashCode {
@@ -65,16 +59,15 @@ class OverlayPainter extends CustomPainter {
 
   @override
   void paint(Canvas canvas, Size size) {
-    canvas.saveLayer(Offset.zero & size,
-        Paint()); // Thanks to https://stackoverflow.com/a/51548959.
+    canvas.saveLayer(Offset.zero & size, Paint()); // Thanks to https://stackoverflow.com/a/51548959.
     canvas.drawColor(_slide.boxShadow.color, BlendMode.dstATop);
     _slide.shape.drawOnCanvas(
       canvas,
       Rect.fromLTRB(
-        _position.left ?? 0,
-        _position.top ?? 0,
-        _position.right ?? size.width,
-        _position.bottom ?? size.height,
+        _position.left,
+        _position.top,
+        _position.right,
+        _position.bottom,
       ),
       _slide.boxShadow.toPaint()..blendMode = BlendMode.clear,
     );
@@ -82,6 +75,5 @@ class OverlayPainter extends CustomPainter {
   }
 
   @override
-  bool shouldRepaint(OverlayPainter oldOverlay) =>
-      oldOverlay._position != _position;
+  bool shouldRepaint(OverlayPainter oldOverlay) => oldOverlay._position != _position;
 }

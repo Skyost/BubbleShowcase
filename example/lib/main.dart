@@ -1,6 +1,7 @@
 import 'package:bubble_showcase/bubble_showcase.dart';
 import 'package:flutter/material.dart';
-import 'package:speech_bubble/speech_bubble.dart';
+
+import 'speech_bubble.dart';
 
 /// First plugin test method.
 void main() => runApp(_BubbleShowcaseDemoApp());
@@ -29,7 +30,7 @@ class _BubbleShowcaseDemoWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    TextStyle textStyle = Theme.of(context).textTheme.body1.copyWith(
+    TextStyle textStyle = Theme.of(context).textTheme.bodyText2!.copyWith(
           color: Colors.white,
         );
     return BubbleShowcase(
@@ -122,8 +123,8 @@ class _BubbleShowcaseDemoWidget extends StatelessWidget {
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    Padding(
-                      padding: const EdgeInsets.only(right: 5),
+                    const Padding(
+                      padding: EdgeInsets.only(right: 5),
                       child: Icon(
                         Icons.info_outline,
                         color: Colors.white,
@@ -165,25 +166,25 @@ class _BubbleShowcaseDemoChild extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             Container(
+              width: MediaQuery.of(context).size.width,
               child: Text(
                 'Bubble Showcase',
                 key: _titleKey,
-                style: Theme.of(context).textTheme.display1,
+                style: Theme.of(context).textTheme.headline4,
                 textAlign: TextAlign.center,
               ),
-              width: MediaQuery.of(context).size.width,
             ),
             Padding(
-              padding: const EdgeInsets.only(top: 30),
-              child: RaisedButton(
-                child: const Text('This button is NEW !'),
+              padding: const EdgeInsets.only(top: 30, bottom: 5),
+              child: ElevatedButton(
                 key: _firstButtonKey,
                 onPressed: () {},
+                child: const Text('This button is NEW !'),
               ),
             ),
-            RaisedButton(
-              child: const Text('This button is old, please don\'t pay attention.'),
+            ElevatedButton(
               onPressed: () {},
+              child: const Text('This button is old, please don\'t pay attention.'),
             )
           ],
         ),
