@@ -1,6 +1,6 @@
 name: bubble_showcase
 description: BubbleShowcase is a small but powerful flutter package that allows you to highlight specific parts of your app to explain them to the user or to show your app new features.
-version: 1.0.0
+version: 1.1.0
 homepage: https://github.com/Skyost/BubbleShowcase
 
 environment:

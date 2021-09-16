@@ -28,6 +28,9 @@ class BubbleShowcase extends StatefulWidget {
   /// Whether to show a close button.
   final bool showCloseButton;
 
+  // Duration by which delay showcase initialization.
+   final Duration initialDelay;
+
   /// Creates a new bubble showcase instance.
   BubbleShowcase({
     required this.bubbleShowcaseId,
@@ -37,6 +40,7 @@ class BubbleShowcase extends StatefulWidget {
     required this.child,
     this.counterText = ':i/:n',
     this.showCloseButton = true,
+    this.initialDelay = Duration.zero,
   }) : assert(bubbleSlides.isNotEmpty);
 
   @override
@@ -65,6 +69,7 @@ class _BubbleShowcaseState extends State<BubbleShowcase> with WidgetsBindingObse
   void initState() {
     WidgetsBinding.instance?.addPostFrameCallback((_) async {
       if (await widget.shouldOpenShowcase) {
+        await Future.delayed(widget.initialDelay);
         goToNextEntryOrClose(0);
       }
     });
