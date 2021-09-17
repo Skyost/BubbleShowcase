@@ -70,7 +70,9 @@ class _BubbleShowcaseState extends State<BubbleShowcase> with WidgetsBindingObse
     WidgetsBinding.instance?.addPostFrameCallback((_) async {
       if (await widget.shouldOpenShowcase) {
         await Future.delayed(widget.initialDelay);
-        goToNextEntryOrClose(0);
+        if (mounted) {
+          goToNextEntryOrClose(0);
+        }
       }
     });
     WidgetsBinding.instance?.addObserver(this);
