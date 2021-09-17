@@ -1,3 +1,7 @@
+## [1.1.0] - 2021-09-16
+
+* Added initialDelay parameter.
+
 ## [1.0.0] - 2021-03-05
 
 * Migrated to null safety.
