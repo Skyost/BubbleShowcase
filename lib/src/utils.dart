@@ -30,10 +30,16 @@ class Position {
   });
 
   @override
-  String toString() => 'Position(top: $top, right: $right, bottom: $bottom, left: $left)';
+  String toString() =>
+      'Position(top: $top, right: $right, bottom: $bottom, left: $left)';
 
   @override
-  bool operator ==(Object other) => other is Position && top == other.top && right == other.right && bottom == other.bottom && left == other.left;
+  bool operator ==(Object other) =>
+      other is Position &&
+      top == other.top &&
+      right == other.right &&
+      bottom == other.bottom &&
+      left == other.left;
 
   @override
   int get hashCode {
@@ -59,7 +65,10 @@ class OverlayPainter extends CustomPainter {
 
   @override
   void paint(Canvas canvas, Size size) {
-    canvas.saveLayer(Offset.zero & size, Paint()); // Thanks to https://stackoverflow.com/a/51548959.
+    canvas.saveLayer(
+      Offset.zero & size,
+      Paint(),
+    ); // Thanks to https://stackoverflow.com/a/51548959.
     canvas.drawColor(_slide.boxShadow.color, BlendMode.dstATop);
     _slide.shape.drawOnCanvas(
       canvas,
@@ -75,5 +84,34 @@ class OverlayPainter extends CustomPainter {
   }
 
   @override
-  bool shouldRepaint(OverlayPainter oldOverlay) => oldOverlay._position != _position;
+  bool shouldRepaint(OverlayPainter oldOverlay) =>
+      oldOverlay._position != _position;
+}
+
+class OverlayClipper extends CustomClipper<Path> {
+  final BubbleSlide _slide;
+  final Position _position;
+
+  const OverlayClipper(this._slide, this._position);
+
+  @override
+  Path getClip(Size size) {
+    final path = Path();
+    path.addRect(Rect.fromLTWH(0, 0, size.width, size.height));
+    _slide.shape.makePath(
+      path,
+      Rect.fromLTRB(
+        _position.left,
+        _position.top,
+        _position.right,
+        _position.bottom,
+      ),
+    );
+    path.fillType = PathFillType.evenOdd;
+
+    return path;
+  }
+
+  @override
+  bool shouldReclip(covariant CustomClipper oldClipper) => false;
 }

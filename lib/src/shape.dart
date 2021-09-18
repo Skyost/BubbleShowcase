@@ -7,6 +7,8 @@ abstract class Shape {
 
   /// Draw the shape on the specified canvas.
   void drawOnCanvas(Canvas canvas, Rect rectangle, Paint paint);
+
+  void makePath(Path path, Rect rectangle);
 }
 
 /// A rectangle shape.
@@ -22,6 +24,11 @@ class Rectangle extends Shape {
   @override
   void drawOnCanvas(Canvas canvas, Rect rectangle, Paint paint) {
     canvas.drawRect(rectangle.inflate(spreadRadius), paint);
+  }
+
+  @override
+  void makePath(Path path, Rect rectangle) {
+    path.addRect(rectangle);
   }
 }
 
@@ -41,7 +48,14 @@ class RoundedRectangle extends Shape {
 
   @override
   void drawOnCanvas(Canvas canvas, Rect rectangle, Paint paint) {
-    canvas.drawRRect(RRect.fromRectAndRadius(rectangle.inflate(spreadRadius), radius), paint);
+    canvas.drawRRect(
+        RRect.fromRectAndRadius(rectangle.inflate(spreadRadius), radius),
+        paint);
+  }
+
+  @override
+  void makePath(Path path, Rect rectangle) {
+    path.addRRect(RRect.fromRectAndRadius(rectangle, radius));
   }
 }
 
@@ -59,6 +73,11 @@ class Oval extends Shape {
   void drawOnCanvas(Canvas canvas, Rect rectangle, Paint paint) {
     canvas.drawOval(rectangle.inflate(spreadRadius), paint);
   }
+
+  @override
+  void makePath(Path path, Rect rectangle) {
+    path.addOval(rectangle.inflate(spreadRadius));
+  }
 }
 
 /// A circle shape.
@@ -75,5 +94,12 @@ class Circle extends Shape {
   void drawOnCanvas(Canvas canvas, Rect rectangle, Paint paint) {
     Rect circle = rectangle.inflate(spreadRadius);
     canvas.drawCircle(circle.center, circle.longestSide / 2, paint);
+  }
+
+  @override
+  void makePath(Path path, Rect rectangle) {
+    path.addOval(
+      Rect.fromCircle(center: rectangle.center, radius: rectangle.width / 2),
+    );
   }
 }
