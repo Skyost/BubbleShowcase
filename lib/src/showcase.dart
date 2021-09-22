@@ -105,6 +105,7 @@ class _BubbleShowcaseState extends State<BubbleShowcase>
   }
 
   bool processNotification(BubbleShowcaseNotification notif) {
+    if (isFinished) return true;
     goToNextEntryOrClose(currentSlideIndex + 1);
     return true;
   }
