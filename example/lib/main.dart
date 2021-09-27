@@ -28,6 +28,9 @@ class _BubbleShowcaseDemoWidget extends StatelessWidget {
   /// The first button global key.
   final GlobalKey _firstButtonKey = GlobalKey();
 
+  /// The second button global key.
+  final GlobalKey _secondButtonKey = GlobalKey();
+
   @override
   Widget build(BuildContext context) {
     TextStyle textStyle = Theme.of(context).textTheme.bodyText2!.copyWith(
@@ -40,8 +43,13 @@ class _BubbleShowcaseDemoWidget extends StatelessWidget {
         _firstSlide(textStyle),
         _secondSlide(textStyle),
         _thirdSlide(textStyle),
+        _fourthSlide(textStyle),
       ],
-      child: _BubbleShowcaseDemoChild(_titleKey, _firstButtonKey),
+      child: _BubbleShowcaseDemoChild(
+        _titleKey,
+        _firstButtonKey,
+        _secondButtonKey,
+      ),
     );
   }
 
@@ -143,6 +151,46 @@ class _BubbleShowcaseDemoWidget extends StatelessWidget {
           ),
         ),
       );
+
+  /// Creates the fourth slide.
+  BubbleSlide _fourthSlide(TextStyle textStyle) => RelativeBubbleSlide(
+        highlightPadding: 4,
+        passThroughMode: PassthroughMode.INSIDE_WITH_NOTIFICATION,
+        widgetKey: _secondButtonKey,
+        shape: const Oval(
+          spreadRadius: 15,
+        ),
+        child: RelativeBubbleSlideChild(
+          widget: Padding(
+            padding: const EdgeInsets.only(top: 8),
+            child: SpeechBubble(
+              nipLocation: NipLocation.TOP,
+              color: Colors.blue,
+              child: Padding(
+                padding: const EdgeInsets.all(10),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
+                      'Going through!',
+                      style: textStyle.copyWith(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    const SizedBox(height: 10),
+                    Text(
+                      'Passthrough is on!\nTo finish the tutorial, you need to click this button',
+                      style: textStyle,
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ),
+      );
 }
 
 /// The main demo widget child.
@@ -152,9 +200,11 @@ class _BubbleShowcaseDemoChild extends StatelessWidget {
 
   /// The first button global key.
   final GlobalKey _firstButtonKey;
+  final GlobalKey _secondButtonKey;
 
   /// Creates a new bubble showcase demo child instance.
-  _BubbleShowcaseDemoChild(this._titleKey, this._firstButtonKey);
+  _BubbleShowcaseDemoChild(
+      this._titleKey, this._firstButtonKey, this._secondButtonKey);
 
   @override
   Widget build(BuildContext context) => Padding(
@@ -183,8 +233,13 @@ class _BubbleShowcaseDemoChild extends StatelessWidget {
               ),
             ),
             ElevatedButton(
-              onPressed: () {},
-              child: const Text('This button is old, please don\'t pay attention.'),
+              key: _secondButtonKey,
+              onPressed: () {
+                const BubbleShowcaseNotification()..dispatch(context);
+              },
+              child: const Text(
+                'This button is old, please don\'t pay attention.',
+              ),
             )
           ],
         ),

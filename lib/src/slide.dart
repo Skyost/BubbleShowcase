@@ -7,6 +7,18 @@ import 'package:flutter/material.dart';
 /// A function that allows to calculate a position according to a provided size.
 typedef PositionCalculator = Position Function(Size size);
 
+/// Pointer passthrough mode for the BubbleSlide
+enum PassthroughMode {
+  /// Passes through pointer events inside the highlighted area, interaction events will pass down to children.
+  ///
+  /// You will need to dispatch a [BubbleShowcaseNotification] from the children to continue
+  /// the showcase. Interaction events will NOT continue the showcase.
+  INSIDE_WITH_NOTIFICATION,
+
+  /// Does not pass through any pointer events (default)
+  NONE,
+}
+
 /// A simple bubble slide that allows to highlight a specific screen zone.
 abstract class BubbleSlide {
   /// The slide shape.
@@ -20,6 +32,8 @@ abstract class BubbleSlide {
 
   /// Triggered when this slide has been exited.
   final VoidCallback? onExit;
+
+  final PassthroughMode passthroughMode;
 
   /// The slide child.
   final BubbleSlideChild? child;
@@ -35,25 +49,63 @@ abstract class BubbleSlide {
     this.onEnter,
     this.onExit,
     this.child,
+    this.passthroughMode = PassthroughMode.NONE,
   });
 
   /// Builds the whole slide widget.
-  Widget build(BuildContext context, BubbleShowcase bubbleShowcase, int currentSlideIndex, void Function(int) goToSlide) {
-    Position highlightPosition = getHighlightPosition(context, bubbleShowcase, currentSlideIndex);
-    List<Widget> children = [
-      Positioned.fill(
-        child: CustomPaint(
-          painter: OverlayPainter(this, highlightPosition),
-        ),
-      ),
-    ];
+  Widget build(
+    BuildContext context,
+    BubbleShowcase bubbleShowcase,
+    int currentSlideIndex,
+    void Function(int) goToSlide,
+  ) {
+    Position highlightPosition = getHighlightPosition(
+      context,
+      bubbleShowcase,
+      currentSlideIndex,
+    );
 
-    if (child?.widget != null) {
-      children.add(child!.build(context, highlightPosition, MediaQuery.of(context).size));
+    List<Widget> children;
+
+    switch (passthroughMode) {
+      case PassthroughMode.NONE:
+        children = [
+          Positioned.fill(
+            child: CustomPaint(
+              painter: OverlayPainter(this, highlightPosition),
+            ),
+          ),
+        ];
+        break;
+      case PassthroughMode.INSIDE_WITH_NOTIFICATION:
+        children = [
+          Positioned.fill(
+            child: ClipPath(
+              clipper: OverlayClipper(this, highlightPosition),
+              child: Container(
+                color: Colors.black54,
+              ),
+            ),
+          ),
+        ];
+        break;
     }
 
+    // Add BubbleSlide
+    if (child?.widget != null) {
+      children.add(
+        child!.build(
+          context,
+          highlightPosition,
+          MediaQuery.of(context).size,
+        ),
+      );
+    }
+
+    // Add counter text
     int slidesCount = bubbleShowcase.bubbleSlides.length;
-    Color writeColor = Utils.isColorDark(boxShadow.color) ? Colors.white : Colors.black;
+    Color writeColor =
+        Utils.isColorDark(boxShadow.color) ? Colors.white : Colors.black;
     if (bubbleShowcase.counterText != null) {
       children.add(
         Positioned(
@@ -61,14 +113,20 @@ abstract class BubbleSlide {
           left: 0,
           right: 0,
           child: Text(
-            bubbleShowcase.counterText!.replaceAll(':i', (currentSlideIndex + 1).toString()).replaceAll(':n', slidesCount.toString()),
-            style: Theme.of(context).textTheme.bodyText2!.copyWith(color: writeColor),
+            bubbleShowcase.counterText!
+                .replaceAll(':i', (currentSlideIndex + 1).toString())
+                .replaceAll(':n', slidesCount.toString()),
+            style: Theme.of(context)
+                .textTheme
+                .bodyText2!
+                .copyWith(color: writeColor),
             textAlign: TextAlign.center,
           ),
         ),
       );
     }
 
+    // Add Close button
     if (bubbleShowcase.showCloseButton) {
       children.add(Positioned(
         top: MediaQuery.of(context).padding.top,
@@ -83,22 +141,35 @@ abstract class BubbleSlide {
       ));
     }
 
-    return GestureDetector(
-      onTap: () => goToSlide(currentSlideIndex + 1),
-      child: Stack(
+    if (passthroughMode == PassthroughMode.INSIDE_WITH_NOTIFICATION) {
+      return Stack(
         children: children,
-      ),
-    );
+      );
+    } else {
+      return GestureDetector(
+        onTap: () => goToSlide(currentSlideIndex + 1),
+        child: Stack(
+          children: children,
+        ),
+      );
+    }
   }
 
   /// Returns the position to highlight.
-  Position getHighlightPosition(BuildContext context, BubbleShowcase bubbleShowcase, int currentSlideIndex);
+  Position getHighlightPosition(
+    BuildContext context,
+    BubbleShowcase bubbleShowcase,
+    int currentSlideIndex,
+  );
 }
 
 /// A bubble slide with a position that depends on another widget.
 class RelativeBubbleSlide extends BubbleSlide {
   /// The widget key.
   final GlobalKey widgetKey;
+
+  /// Padding for the highlight area
+  final int highlightPadding;
 
   /// Creates a new relative bubble slide instance.
   const RelativeBubbleSlide({
@@ -108,24 +179,32 @@ class RelativeBubbleSlide extends BubbleSlide {
       blurRadius: 0,
       spreadRadius: 0,
     ),
+    passThroughMode = PassthroughMode.NONE,
     required BubbleSlideChild child,
     required this.widgetKey,
+    this.highlightPadding = 0,
   }) : super(
           shape: shape,
           boxShadow: boxShadow,
           child: child,
+          passthroughMode: passThroughMode,
         );
 
   @override
-  Position getHighlightPosition(BuildContext context, BubbleShowcase bubbleShowcase, int currentSlideIndex) {
-    RenderBox renderBox = widgetKey.currentContext!.findRenderObject() as RenderBox;
+  Position getHighlightPosition(
+    BuildContext context,
+    BubbleShowcase bubbleShowcase,
+    int currentSlideIndex,
+  ) {
+    RenderBox renderBox =
+        widgetKey.currentContext!.findRenderObject() as RenderBox;
     Offset offset = renderBox.localToGlobal(Offset.zero);
 
     return Position(
-      top: offset.dy,
-      right: offset.dx + renderBox.size.width,
-      bottom: offset.dy + renderBox.size.height,
-      left: offset.dx,
+      top: offset.dy - highlightPadding,
+      right: offset.dx + renderBox.size.width + highlightPadding,
+      bottom: offset.dy + renderBox.size.height + highlightPadding,
+      left: offset.dx - highlightPadding,
     );
   }
 }
@@ -152,7 +231,12 @@ class AbsoluteBubbleSlide extends BubbleSlide {
         );
 
   @override
-  Position getHighlightPosition(BuildContext context, BubbleShowcase bubbleShowcase, int currentSlideIndex) => positionCalculator(MediaQuery.of(context).size);
+  Position getHighlightPosition(
+    BuildContext context,
+    BubbleShowcase bubbleShowcase,
+    int currentSlideIndex,
+  ) =>
+      positionCalculator(MediaQuery.of(context).size);
 }
 
 /// A bubble slide child, holding a widget.
@@ -178,7 +262,11 @@ abstract class BubbleSlideChild {
   }
 
   /// Returns child position according to the highlight position and parent size.
-  Position getPosition(BuildContext context, Position highlightPosition, Size parentSize);
+  Position getPosition(
+    BuildContext context,
+    Position highlightPosition,
+    Size parentSize,
+  );
 }
 
 /// A bubble slide with a position that depends on the highlight zone.
@@ -195,7 +283,11 @@ class RelativeBubbleSlideChild extends BubbleSlideChild {
         );
 
   @override
-  Position getPosition(BuildContext context, Position highlightPosition, Size parentSize) {
+  Position getPosition(
+    BuildContext context,
+    Position highlightPosition,
+    Size parentSize,
+  ) {
     switch (direction) {
       case AxisDirection.up:
         return Position(
@@ -234,10 +326,13 @@ class AbsoluteBubbleSlideChild extends BubbleSlideChild {
   const AbsoluteBubbleSlideChild({
     required Widget widget,
     required this.positionCalculator,
-  }) : super(
-          widget: widget,
-        );
+  }) : super(widget: widget);
 
   @override
-  Position getPosition(BuildContext context, Position highlightPosition, Size parentSize) => positionCalculator(parentSize);
+  Position getPosition(
+    BuildContext context,
+    Position highlightPosition,
+    Size parentSize,
+  ) =>
+      positionCalculator(parentSize);
 }

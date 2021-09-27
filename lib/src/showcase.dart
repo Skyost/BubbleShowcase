@@ -29,7 +29,7 @@ class BubbleShowcase extends StatefulWidget {
   final bool showCloseButton;
 
   // Duration by which delay showcase initialization.
-   final Duration initialDelay;
+  final Duration initialDelay;
 
   /// Creates a new bubble showcase instance.
   BubbleShowcase({
@@ -52,13 +52,15 @@ class BubbleShowcase extends StatefulWidget {
       return true;
     }
     SharedPreferences preferences = await SharedPreferences.getInstance();
-    bool? result = preferences.getBool('$bubbleShowcaseId.$bubbleShowcaseVersion');
+    bool? result =
+        preferences.getBool('$bubbleShowcaseId.$bubbleShowcaseVersion');
     return result == null || result;
   }
 }
 
 /// The BubbleShowcase state.
-class _BubbleShowcaseState extends State<BubbleShowcase> with WidgetsBindingObserver {
+class _BubbleShowcaseState extends State<BubbleShowcase>
+    with WidgetsBindingObserver {
   /// The current slide index.
   int currentSlideIndex = -1;
 
@@ -79,7 +81,11 @@ class _BubbleShowcaseState extends State<BubbleShowcase> with WidgetsBindingObse
   }
 
   @override
-  Widget build(BuildContext context) => widget.child;
+  Widget build(BuildContext context) =>
+      NotificationListener<BubbleShowcaseNotification>(
+        onNotification: processNotification,
+        child: widget.child,
+      );
 
   @override
   void dispose() {
@@ -98,8 +104,16 @@ class _BubbleShowcaseState extends State<BubbleShowcase> with WidgetsBindingObse
     });
   }
 
+  bool processNotification(BubbleShowcaseNotification notif) {
+    if (isFinished) return true;
+    goToNextEntryOrClose(currentSlideIndex + 1);
+    return true;
+  }
+
   /// Returns whether the showcasing is finished.
-  bool get isFinished => currentSlideIndex == -1 || currentSlideIndex == widget.bubbleSlides.length;
+  bool get isFinished =>
+      currentSlideIndex == -1 ||
+      currentSlideIndex == widget.bubbleSlides.length;
 
   /// Allows to go to the next entry (or to close the showcase if needed).
   void goToNextEntryOrClose(int position) {
@@ -111,7 +125,9 @@ class _BubbleShowcaseState extends State<BubbleShowcase> with WidgetsBindingObse
       currentSlideEntry = null;
       if (widget.doNotReopenOnClose) {
         SharedPreferences.getInstance().then((preferences) {
-          preferences.setBool('${widget.bubbleShowcaseId}.${widget.bubbleShowcaseVersion}', false);
+          preferences.setBool(
+              '${widget.bubbleShowcaseId}.${widget.bubbleShowcaseVersion}',
+              false);
         });
       }
     } else {
@@ -135,7 +151,8 @@ class _BubbleShowcaseState extends State<BubbleShowcase> with WidgetsBindingObse
 
   /// Allows to trigger enter callbacks.
   void triggerOnEnter() {
-    if (currentSlideIndex >= 0 && currentSlideIndex < widget.bubbleSlides.length) {
+    if (currentSlideIndex >= 0 &&
+        currentSlideIndex < widget.bubbleSlides.length) {
       VoidCallback? callback = widget.bubbleSlides[currentSlideIndex].onEnter;
       if (callback != null) {
         callback();
@@ -145,11 +162,17 @@ class _BubbleShowcaseState extends State<BubbleShowcase> with WidgetsBindingObse
 
   /// Allows to trigger exit callbacks.
   void triggerOnExit() {
-    if (currentSlideIndex >= 0 && currentSlideIndex < widget.bubbleSlides.length) {
+    if (currentSlideIndex >= 0 &&
+        currentSlideIndex < widget.bubbleSlides.length) {
       VoidCallback? callback = widget.bubbleSlides[currentSlideIndex].onExit;
       if (callback != null) {
         callback();
       }
     }
   }
+}
+
+/// Notification Used to tell the [BubbleShowcase] to continue the showcase
+class BubbleShowcaseNotification extends Notification {
+  const BubbleShowcaseNotification();
 }
