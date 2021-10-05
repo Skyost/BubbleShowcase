@@ -1,6 +1,8 @@
 ## [1.1.0] - 2021-09-16
 
-* Added initialDelay parameter.
+* Added `initialDelay` and `enabled` parameters (thanks [rodineijf](https://github.com/rodineijf)).
+* Use clipper to passthrough pointer events (thanks [Termtime](https://github.com/Termtime)).
+* Ignoring notification if the showcase has finished (thanks [Termtime](https://github.com/Termtime)).
 
 ## [1.0.0] - 2021-03-05
 
