@@ -274,10 +274,17 @@ class RelativeBubbleSlideChild extends BubbleSlideChild {
   /// The child direction.
   final AxisDirection direction;
 
+  /// Enables a new positioning system that will allow the child of the slide to
+  /// expand beyond the highlighted area's dimensions.
+  ///
+  /// Heavily assisted by using an `Align` widget to align it within the expanded space
+  final bool enableExtraSpace;
+
   /// Creates a new relative bubble slide child instance.
   const RelativeBubbleSlideChild({
     required Widget widget,
     this.direction = AxisDirection.down,
+    this.enableExtraSpace = false,
   }) : super(
           widget: widget,
         );
@@ -288,31 +295,259 @@ class RelativeBubbleSlideChild extends BubbleSlideChild {
     Position highlightPosition,
     Size parentSize,
   ) {
-    switch (direction) {
-      case AxisDirection.up:
+    if (enableExtraSpace) {
+      int quadrant =
+          _getQuadrantFromRelativePosition(highlightPosition, parentSize);
+
+      switch (direction) {
+        case AxisDirection.up:
+          return _getUpPositionFromQuadrant(
+            quadrant,
+            parentSize,
+            highlightPosition,
+          );
+        case AxisDirection.right:
+          return _getRightPositionFromQuadrant(
+            quadrant,
+            parentSize,
+            highlightPosition,
+          );
+        case AxisDirection.left:
+          return _getLeftPositionFromQuadrant(
+            quadrant,
+            parentSize,
+            highlightPosition,
+          );
+        default:
+          return _getDownPositionFromQuadrant(
+              quadrant, parentSize, highlightPosition);
+      }
+    } else {
+      switch (direction) {
+        case AxisDirection.up:
+          return Position(
+            right: parentSize.width - highlightPosition.right,
+            bottom: parentSize.height - highlightPosition.top,
+            left: highlightPosition.left,
+          );
+        case AxisDirection.right:
+          return Position(
+            top: highlightPosition.top,
+            bottom: parentSize.height - highlightPosition.bottom,
+            right: parentSize.width - highlightPosition.left,
+          );
+        case AxisDirection.left:
+          return Position(
+            top: highlightPosition.top,
+            bottom: parentSize.height - highlightPosition.bottom,
+            left: highlightPosition.right,
+          );
+        default:
+          return Position(
+            top: highlightPosition.bottom,
+            right: parentSize.width - highlightPosition.right,
+            left: highlightPosition.left,
+          );
+      }
+    }
+  }
+
+  int _getQuadrantFromRelativePosition(
+    Position highlightPosition,
+    Size parentSize,
+  ) {
+    final r = highlightPosition.right;
+    final l = highlightPosition.left;
+    final t = highlightPosition.top;
+    final b = highlightPosition.bottom;
+
+    final p = parentSize;
+
+    if (l >= p.width / 2 && b <= p.height / 2) {
+      return 1; // top right
+    } else if (r <= p.width / 2 && b <= p.height / 2) {
+      return 2; // top left
+    } else if (r <= p.width / 2 && t >= p.height / 2) {
+      return 3; // bottom right
+    } else if (l >= p.width / 2 && t >= p.height / 2) {
+      return 4; // bottom left
+    } else {
+      return 5; // center (Not totally within any other quadrant)
+    }
+  }
+
+  Position _getDownPositionFromQuadrant(
+    int quadrant,
+    Size parentSize,
+    Position highlightPosition,
+  ) {
+    switch (quadrant) {
+      case 1:
+      case 4:
+        // It will expand to the left
+        final spacingFromTheRightEdge =
+            parentSize.width - highlightPosition.right;
+        print(highlightPosition);
         return Position(
-          right: parentSize.width - highlightPosition.right,
-          bottom: parentSize.height - highlightPosition.top,
-          left: highlightPosition.left,
+          right: spacingFromTheRightEdge,
+          top: highlightPosition.bottom,
         );
-      case AxisDirection.right:
+      case 2:
+      case 3:
+        // It will expand to the right
+        return Position(
+          left: highlightPosition.left,
+          top: highlightPosition.bottom,
+        );
+      case 5:
+        final widthFromRightEdge = parentSize.width - highlightPosition.right;
+        final widthFromLeftEdge = highlightPosition.left;
+        final availableWidth = widthFromRightEdge > widthFromLeftEdge
+            ? highlightPosition.right
+            : highlightPosition.left;
+
+        return Position(
+          top: highlightPosition.bottom,
+          right: widthFromRightEdge > widthFromLeftEdge
+              ? (widthFromRightEdge) - (availableWidth / 2)
+              : availableWidth / 2,
+          left: widthFromLeftEdge > widthFromRightEdge
+              ? (widthFromLeftEdge) + (availableWidth / 2)
+              : availableWidth / 2,
+        );
+      default:
+        throw ("Positioning is not optimal");
+    }
+  }
+
+  Position _getLeftPositionFromQuadrant(
+    int quadrant,
+    Size parentSize,
+    Position highlightPosition,
+  ) {
+    switch (quadrant) {
+      case 1:
+      case 2:
+        // It will expand to the bottom
         return Position(
           top: highlightPosition.top,
-          bottom: parentSize.height - highlightPosition.bottom,
           right: parentSize.width - highlightPosition.left,
         );
-      case AxisDirection.left:
+      case 3:
+      case 4:
+        // It will expand to the top
+        return Position(
+          bottom: parentSize.height - highlightPosition.top,
+          right: parentSize.width - highlightPosition.left,
+        );
+      case 5:
+        // It will be centered
+        final topHeightFromEdge = highlightPosition.top;
+        final bottomHeightFromEdge =
+            parentSize.height - highlightPosition.bottom;
+        final availableHeight = topHeightFromEdge > bottomHeightFromEdge
+            ? parentSize.height - highlightPosition.bottom
+            : parentSize.height - highlightPosition.top;
+
+        return Position(
+          top: topHeightFromEdge > bottomHeightFromEdge
+              ? (topHeightFromEdge) - (availableHeight / 2)
+              : 0,
+          bottom: bottomHeightFromEdge > topHeightFromEdge
+              ? (bottomHeightFromEdge) + (availableHeight / 2)
+              : availableHeight / 2,
+          right: highlightPosition.right,
+        );
+
+      default:
+        throw ("Slide is outside the view area");
+    }
+  }
+
+  Position _getRightPositionFromQuadrant(
+    int quadrant,
+    Size parentSize,
+    Position highlightPosition,
+  ) {
+    switch (quadrant) {
+      case 1:
+      case 2:
+        // It will expand to the bottom
         return Position(
           top: highlightPosition.top,
-          bottom: parentSize.height - highlightPosition.bottom,
+          left: highlightPosition.right,
+        );
+      case 3:
+      case 4:
+        // It will expand to the top
+        return Position(
+          bottom: parentSize.height - highlightPosition.top,
+          left: highlightPosition.right,
+        );
+      case 5:
+        // It will be centered
+        final topHeightFromEdge = highlightPosition.top;
+        final bottomHeightFromEdge =
+            parentSize.height - highlightPosition.bottom;
+        final availableHeight = topHeightFromEdge > bottomHeightFromEdge
+            ? parentSize.height - highlightPosition.bottom
+            : parentSize.height - highlightPosition.top;
+
+        return Position(
+          top: topHeightFromEdge > bottomHeightFromEdge
+              ? (topHeightFromEdge) - (availableHeight / 2)
+              : 0,
+          bottom: bottomHeightFromEdge > topHeightFromEdge
+              ? (bottomHeightFromEdge) + (availableHeight / 2)
+              : availableHeight / 2,
           left: highlightPosition.right,
         );
       default:
+        throw ("Slide is outside the view area");
+    }
+  }
+
+  Position _getUpPositionFromQuadrant(
+    int quadrant,
+    Size parentSize,
+    Position highlightPosition,
+  ) {
+    switch (quadrant) {
+      case 1:
+      case 4:
+        // It will expand to the left
+        final spacingFromTheRightEdge =
+            parentSize.width - highlightPosition.right;
+        print(highlightPosition);
         return Position(
-          top: highlightPosition.bottom,
-          right: parentSize.width - highlightPosition.right,
-          left: highlightPosition.left,
+          right: spacingFromTheRightEdge,
+          bottom: parentSize.height - highlightPosition.top,
         );
+      case 2:
+      case 3:
+        // It will expand to the right
+        return Position(
+          left: highlightPosition.left,
+          bottom: parentSize.height - highlightPosition.top,
+        );
+      case 5:
+        final widthFromRightEdge = parentSize.width - highlightPosition.right;
+        final widthFromLeftEdge = highlightPosition.left;
+        final availableWidth = widthFromRightEdge > widthFromLeftEdge
+            ? highlightPosition.right
+            : highlightPosition.left;
+
+        return Position(
+          bottom: parentSize.height - highlightPosition.top,
+          right: widthFromRightEdge > widthFromLeftEdge
+              ? (widthFromRightEdge) - (availableWidth / 2)
+              : availableWidth / 2,
+          left: widthFromLeftEdge > widthFromRightEdge
+              ? (widthFromLeftEdge) + (availableWidth / 2)
+              : availableWidth / 2,
+        );
+      default:
+        throw ("Slide is outside the view area");
     }
   }
 }
