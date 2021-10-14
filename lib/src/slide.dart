@@ -387,7 +387,6 @@ class RelativeBubbleSlideChild extends BubbleSlideChild {
         // It will expand to the left
         final spacingFromTheRightEdge =
             parentSize.width - highlightPosition.right;
-        print(highlightPosition);
         return Position(
           right: spacingFromTheRightEdge,
           top: highlightPosition.bottom,
@@ -518,7 +517,6 @@ class RelativeBubbleSlideChild extends BubbleSlideChild {
         // It will expand to the left
         final spacingFromTheRightEdge =
             parentSize.width - highlightPosition.right;
-        print(highlightPosition);
         return Position(
           right: spacingFromTheRightEdge,
           bottom: parentSize.height - highlightPosition.top,
