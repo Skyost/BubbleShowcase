@@ -415,7 +415,7 @@ class RelativeBubbleSlideChild extends BubbleSlideChild {
               : availableWidth / 2,
         );
       default:
-        throw ("Positioning is not optimal");
+        throw ("Slide is outside the view area");
     }
   }
 
@@ -445,16 +445,32 @@ class RelativeBubbleSlideChild extends BubbleSlideChild {
         final bottomHeightFromEdge =
             parentSize.height - highlightPosition.bottom;
         final availableHeight = topHeightFromEdge > bottomHeightFromEdge
-            ? parentSize.height - highlightPosition.bottom
-            : parentSize.height - highlightPosition.top;
+            ? (parentSize.height - highlightPosition.bottom) -
+                (parentSize.height - highlightPosition.top)
+            : (parentSize.height - highlightPosition.top) -
+                (parentSize.height - highlightPosition.bottom);
+        final highlightedItemSize = Size(
+            highlightPosition.right - highlightPosition.left,
+            highlightPosition.bottom - highlightPosition.top);
+        double top;
+        double bottom;
+        if (topHeightFromEdge > bottomHeightFromEdge) {
+          top = (topHeightFromEdge) -
+              ((availableHeight / 2) +
+                  (bottomHeightFromEdge / 2) +
+                  highlightedItemSize.height);
+          bottom = (bottomHeightFromEdge / 2) - highlightedItemSize.height / 2;
+        } else {
+          top = (topHeightFromEdge / 2) - highlightedItemSize.height;
+          bottom = (bottomHeightFromEdge) -
+              ((availableHeight / 2) +
+                  (topHeightFromEdge / 2) +
+                  highlightedItemSize.height / 2);
+        }
 
         return Position(
-          top: topHeightFromEdge > bottomHeightFromEdge
-              ? (topHeightFromEdge) - (availableHeight / 2)
-              : 0,
-          bottom: bottomHeightFromEdge > topHeightFromEdge
-              ? (bottomHeightFromEdge) + (availableHeight / 2)
-              : availableHeight / 2,
+          top: top,
+          bottom: bottom,
           right: highlightPosition.right,
         );
 
@@ -488,17 +504,35 @@ class RelativeBubbleSlideChild extends BubbleSlideChild {
         final topHeightFromEdge = highlightPosition.top;
         final bottomHeightFromEdge =
             parentSize.height - highlightPosition.bottom;
+
         final availableHeight = topHeightFromEdge > bottomHeightFromEdge
-            ? parentSize.height - highlightPosition.bottom
-            : parentSize.height - highlightPosition.top;
+            ? (parentSize.height - highlightPosition.bottom) -
+                (parentSize.height - highlightPosition.top)
+            : (parentSize.height - highlightPosition.top) -
+                (parentSize.height - highlightPosition.bottom);
+        final highlightedItemSize = Size(
+          highlightPosition.right - highlightPosition.left,
+          highlightPosition.bottom - highlightPosition.top,
+        );
+        double top;
+        double bottom;
+        if (topHeightFromEdge > bottomHeightFromEdge) {
+          top = (topHeightFromEdge) -
+              ((availableHeight / 2) +
+                  (bottomHeightFromEdge / 2) +
+                  highlightedItemSize.height);
+          bottom = (bottomHeightFromEdge / 2) - highlightedItemSize.height / 2;
+        } else {
+          top = (topHeightFromEdge / 2) - highlightedItemSize.height;
+          bottom = (bottomHeightFromEdge) -
+              ((availableHeight / 2) +
+                  (topHeightFromEdge / 2) +
+                  highlightedItemSize.height / 2);
+        }
 
         return Position(
-          top: topHeightFromEdge > bottomHeightFromEdge
-              ? (topHeightFromEdge) - (availableHeight / 2)
-              : 0,
-          bottom: bottomHeightFromEdge > topHeightFromEdge
-              ? (bottomHeightFromEdge) + (availableHeight / 2)
-              : availableHeight / 2,
+          top: top,
+          bottom: bottom,
           left: highlightPosition.right,
         );
       default:
