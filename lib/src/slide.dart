@@ -258,10 +258,7 @@ abstract class BubbleSlideChild {
       right: position.right,
       bottom: position.bottom,
       left: position.left,
-      child: Container(
-        color: Colors.black,
-        child: widget,
-      ),
+      child: widget,
     );
   }
 
