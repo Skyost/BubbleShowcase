@@ -2,6 +2,7 @@ import 'package:bubble_showcase/src/shape.dart';
 import 'package:bubble_showcase/src/showcase.dart';
 import 'package:bubble_showcase/src/utils.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 /// A function that allows to calculate a position according to a provided size.
@@ -257,7 +258,10 @@ abstract class BubbleSlideChild {
       right: position.right,
       bottom: position.bottom,
       left: position.left,
-      child: widget,
+      child: Container(
+        color: Colors.black,
+        child: widget,
+      ),
     );
   }
 
@@ -280,12 +284,30 @@ class RelativeBubbleSlideChild extends BubbleSlideChild {
   /// Heavily assisted by using an `Align` widget to align it within the expanded space
   final bool enableExtraSpace;
 
+  /// Determines, in size a percentage from  0.5 to 0.95, the height of the parent container that will be
+  /// recognized as "Middle" space, starting from the center.
+  ///
+  /// Used by the automatic positioning system to determine
+  /// which positioning strategy to use. Defaults to 65%.
+  final double middlePointHeight;
+
+  /// Determines, in size a percentage from 0.5 to 0.95, the width of the parent container that will be
+  /// recognized as "Middle" space, starting from the center.
+  ///
+  /// Used by the automatic positioning system to determine
+  /// which positioning strategy to use.Defaults to 65%.
+  final double middlePointWidth;
+
   /// Creates a new relative bubble slide child instance.
   const RelativeBubbleSlideChild({
     required Widget widget,
     this.direction = AxisDirection.down,
     this.enableExtraSpace = false,
-  }) : super(
+    this.middlePointWidth = 0.15,
+    this.middlePointHeight = 0.15,
+  })  : assert(middlePointHeight >= 0 && middlePointHeight < 0.45),
+        assert(middlePointWidth >= 0 && middlePointWidth < 0.45),
+        super(
           widget: widget,
         );
 
@@ -296,8 +318,8 @@ class RelativeBubbleSlideChild extends BubbleSlideChild {
     Size parentSize,
   ) {
     if (enableExtraSpace) {
-      int quadrant =
-          _getQuadrantFromRelativePosition(highlightPosition, parentSize);
+      int quadrant = _getQuadrantFromRelativePosition(
+          highlightPosition, parentSize, direction);
 
       switch (direction) {
         case AxisDirection.up:
@@ -355,21 +377,76 @@ class RelativeBubbleSlideChild extends BubbleSlideChild {
   int _getQuadrantFromRelativePosition(
     Position highlightPosition,
     Size parentSize,
+    AxisDirection direction,
   ) {
     final r = highlightPosition.right;
     final l = highlightPosition.left;
     final t = highlightPosition.top;
     final b = highlightPosition.bottom;
 
-    final p = parentSize;
+    final w = parentSize.width;
+    final h = parentSize.height;
+    // Represents the boundaries x1 & y1 represent the positive axes from the middle of the parent
+    // While x2 & y2 represent the negative axes from the middle of the parent
 
-    if (l >= p.width / 2 && b <= p.height / 2) {
+    final middlePointWidthConverted = 0.5 + middlePointWidth;
+    final middlePointHeightConverted = 0.5 + middlePointHeight;
+
+    final x1 = w * middlePointWidthConverted;
+    final x2 = w - (w * middlePointWidthConverted);
+
+    final y1 = h - (h * middlePointHeightConverted);
+    final y2 = h * middlePointHeightConverted;
+
+    // Mx & My represent the middle points of the axes of the highlighted item
+    final highlightAreaSize = Size(r - l, b - t);
+    final mx = l + highlightAreaSize.width / 2;
+    final my = t + highlightAreaSize.height / 2;
+
+    final leansToRightSide = highlightPosition.right < highlightPosition.left;
+    final leansToBottomSide = highlightPosition.bottom < highlightPosition.top;
+
+    final isHorizontal =
+        direction == AxisDirection.left || direction == AxisDirection.right;
+
+    final isVertical =
+        direction == AxisDirection.up || direction == AxisDirection.down;
+
+    // Calculate extremes first, cases where we cannot center (AKA quadrant 5)
+    if (r >= w * 0.95 && isVertical) {
+      if (leansToBottomSide) {
+        return 4;
+      } else {
+        return 1;
+      }
+    } else if (l <= w * 0.05 && isVertical) {
+      if (leansToBottomSide) {
+        return 3;
+      } else {
+        return 2;
+      }
+    } else if (b >= h * 0.95 && isHorizontal) {
+      if (leansToRightSide) {
+        return 4;
+      } else {
+        return 3;
+      }
+    } else if (t <= h * 0.05 && isHorizontal) {
+      if (leansToRightSide) {
+        return 1;
+      } else {
+        return 2;
+      }
+    }
+
+    // Calculate quadrants normally
+    if (mx >= x1 && my <= y1) {
       return 1; // top right
-    } else if (r <= p.width / 2 && b <= p.height / 2) {
+    } else if (mx <= x2 && my <= y1) {
       return 2; // top left
-    } else if (r <= p.width / 2 && t >= p.height / 2) {
+    } else if (mx <= x2 && my >= y2) {
       return 3; // bottom right
-    } else if (l >= p.width / 2 && t >= p.height / 2) {
+    } else if (mx >= x1 && my >= y2) {
       return 4; // bottom left
     } else {
       return 5; // center (Not totally within any other quadrant)
@@ -436,7 +513,7 @@ class RelativeBubbleSlideChild extends BubbleSlideChild {
       case 4:
         // It will expand to the top
         return Position(
-          bottom: parentSize.height - highlightPosition.top,
+          bottom: parentSize.height - highlightPosition.bottom,
           right: parentSize.width - highlightPosition.left,
         );
       case 5:
@@ -450,8 +527,9 @@ class RelativeBubbleSlideChild extends BubbleSlideChild {
             : (parentSize.height - highlightPosition.top) -
                 (parentSize.height - highlightPosition.bottom);
         final highlightedItemSize = Size(
-            highlightPosition.right - highlightPosition.left,
-            highlightPosition.bottom - highlightPosition.top);
+          highlightPosition.right - highlightPosition.left,
+          highlightPosition.bottom - highlightPosition.top,
+        );
         double top;
         double bottom;
         if (topHeightFromEdge > bottomHeightFromEdge) {
@@ -471,7 +549,7 @@ class RelativeBubbleSlideChild extends BubbleSlideChild {
         return Position(
           top: top,
           bottom: bottom,
-          right: highlightPosition.right,
+          right: parentSize.width - highlightPosition.left,
         );
 
       default:
@@ -496,7 +574,7 @@ class RelativeBubbleSlideChild extends BubbleSlideChild {
       case 4:
         // It will expand to the top
         return Position(
-          bottom: parentSize.height - highlightPosition.top,
+          bottom: parentSize.height - highlightPosition.bottom,
           left: highlightPosition.right,
         );
       case 5:
