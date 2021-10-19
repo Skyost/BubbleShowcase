@@ -34,7 +34,7 @@ abstract class BubbleSlide {
   /// Triggered when this slide has been exited.
   final VoidCallback? onExit;
 
-  final PassthroughMode passthroughMode;
+  final PassthroughMode passThroughMode;
 
   /// The slide child.
   final BubbleSlideChild? child;
@@ -50,7 +50,7 @@ abstract class BubbleSlide {
     this.onEnter,
     this.onExit,
     this.child,
-    this.passthroughMode = PassthroughMode.NONE,
+    this.passThroughMode = PassthroughMode.NONE,
   });
 
   /// Builds the whole slide widget.
@@ -68,7 +68,7 @@ abstract class BubbleSlide {
 
     List<Widget> children;
 
-    switch (passthroughMode) {
+    switch (passThroughMode) {
       case PassthroughMode.NONE:
         children = [
           Positioned.fill(
@@ -142,7 +142,7 @@ abstract class BubbleSlide {
       ));
     }
 
-    if (passthroughMode == PassthroughMode.INSIDE_WITH_NOTIFICATION) {
+    if (passThroughMode == PassthroughMode.INSIDE_WITH_NOTIFICATION) {
       return Stack(
         children: children,
       );
@@ -172,6 +172,11 @@ class RelativeBubbleSlide extends BubbleSlide {
   /// Padding for the highlight area
   final int highlightPadding;
 
+  final PassthroughMode passThroughMode;
+
+  final VoidCallback? onEnter;
+  final VoidCallback? onExit;
+
   /// Creates a new relative bubble slide instance.
   const RelativeBubbleSlide({
     Shape shape = const Rectangle(),
@@ -180,15 +185,19 @@ class RelativeBubbleSlide extends BubbleSlide {
       blurRadius: 0,
       spreadRadius: 0,
     ),
-    passThroughMode = PassthroughMode.NONE,
     required BubbleSlideChild child,
     required this.widgetKey,
+    this.passThroughMode = PassthroughMode.NONE,
     this.highlightPadding = 0,
+    this.onEnter,
+    this.onExit,
   }) : super(
           shape: shape,
           boxShadow: boxShadow,
           child: child,
-          passthroughMode: passThroughMode,
+          passThroughMode: passThroughMode,
+          onEnter: onEnter,
+          onExit: onExit,
         );
 
   @override
@@ -215,6 +224,9 @@ class AbsoluteBubbleSlide extends BubbleSlide {
   /// The function that allows to compute the highlight position according to the parent size.
   final PositionCalculator positionCalculator;
 
+  final VoidCallback? onEnter;
+  final VoidCallback? onExit;
+
   /// Creates a new absolute bubble slide instance.
   const AbsoluteBubbleSlide({
     Shape shape = const Rectangle(),
@@ -225,10 +237,14 @@ class AbsoluteBubbleSlide extends BubbleSlide {
     ),
     required BubbleSlideChild child,
     required this.positionCalculator,
+    this.onEnter,
+    this.onExit,
   }) : super(
           shape: shape,
           boxShadow: boxShadow,
           child: child,
+          onEnter: onEnter,
+          onExit: onExit,
         );
 
   @override

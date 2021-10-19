@@ -171,9 +171,10 @@ class _BubbleShowcaseState extends State<BubbleShowcase>
 
   /// Allows to trigger exit callbacks.
   void triggerOnExit() {
-    if (currentSlideIndex >= 0 &&
+    if (currentSlideIndex > 0 &&
         currentSlideIndex < widget.bubbleSlides.length) {
-      VoidCallback? callback = widget.bubbleSlides[currentSlideIndex].onExit;
+      VoidCallback? callback =
+          widget.bubbleSlides[currentSlideIndex - 1].onExit;
       if (callback != null) {
         callback();
       }

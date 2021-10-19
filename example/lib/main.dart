@@ -67,6 +67,12 @@ class _BubbleShowcaseDemoWidget extends StatelessWidget {
 
   /// Creates the first slide.
   BubbleSlide _firstSlide(TextStyle textStyle) => RelativeBubbleSlide(
+        onEnter: () {
+          print("OnEnter function!");
+        },
+        onExit: () {
+          print("OnExit function!");
+        },
         widgetKey: _firstSlideKey,
         child: RelativeBubbleSlideChild(
           widget: Padding(
