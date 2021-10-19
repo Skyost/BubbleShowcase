@@ -107,6 +107,12 @@ class _BubbleShowcaseDemoWidget extends StatelessWidget {
 
   /// Creates the second slide.
   BubbleSlide _absoluteSlide(TextStyle textStyle) => AbsoluteBubbleSlide(
+        onEnter: () {
+          print("OnEnter function!");
+        },
+        onExit: () {
+          print("OnExit function!");
+        },
         positionCalculator: (size) => Position(
           top: 0,
           right: 0,
