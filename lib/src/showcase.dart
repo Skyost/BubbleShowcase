@@ -34,6 +34,14 @@ class BubbleShowcase extends StatefulWidget {
   /// Wether this showcase should be presented.
   final bool enabled;
 
+  /// Handler that executes when the showcase is dismissed by the close icon
+  final VoidCallback? onDismiss;
+
+  /// Handler that will execute when the showcase finishes
+  ///
+  /// Note that this handler will also execute when `onDismiss` is triggered
+  final VoidCallback? onEnd;
+
   /// Creates a new bubble showcase instance.
   BubbleShowcase({
     required this.bubbleShowcaseId,
@@ -45,6 +53,8 @@ class BubbleShowcase extends StatefulWidget {
     this.showCloseButton = true,
     this.initialDelay = Duration.zero,
     this.enabled = true,
+    this.onDismiss,
+    this.onEnd,
   }) : assert(bubbleSlides.isNotEmpty);
 
   @override
@@ -131,6 +141,9 @@ class _BubbleShowcaseState extends State<BubbleShowcase>
     triggerOnExit();
 
     if (isFinished) {
+      if (widget.onEnd != null) {
+        widget.onEnd!();
+      }
       currentSlideEntry = null;
       if (widget.doNotReopenOnClose) {
         SharedPreferences.getInstance().then((preferences) {

@@ -41,6 +41,12 @@ class _BubbleShowcaseDemoWidget extends StatelessWidget {
           color: Colors.white,
         );
     return BubbleShowcase(
+      onDismiss: () {
+        print('I got dismissed!');
+      },
+      onEnd: () {
+        print('Tutorial has ended!');
+      },
       bubbleShowcaseId: 'my_bubble_showcase',
       bubbleShowcaseVersion: 1,
       bubbleSlides: [
@@ -68,10 +74,10 @@ class _BubbleShowcaseDemoWidget extends StatelessWidget {
   /// Creates the first slide.
   BubbleSlide _firstSlide(TextStyle textStyle) => RelativeBubbleSlide(
         onEnter: () {
-          print("OnEnter function!");
+          print('OnEnter function!');
         },
         onExit: () {
-          print("OnExit function!");
+          print('OnExit function!');
         },
         widgetKey: _firstSlideKey,
         child: RelativeBubbleSlideChild(
@@ -105,13 +111,13 @@ class _BubbleShowcaseDemoWidget extends StatelessWidget {
         ),
       );
 
-  /// Creates the second slide.
+  /// Creates the absolute slide.
   BubbleSlide _absoluteSlide(TextStyle textStyle) => AbsoluteBubbleSlide(
         onEnter: () {
-          print("OnEnter function!");
+          print('OnEnter function!');
         },
         onExit: () {
-          print("OnExit function!");
+          print('OnExit function!');
         },
         positionCalculator: (size) => Position(
           top: 0,
@@ -138,7 +144,7 @@ class _BubbleShowcaseDemoWidget extends StatelessWidget {
         ),
       );
 
-  /// Creates the third slide.
+  /// Creates the second slide.
   BubbleSlide _secondSlide(TextStyle textStyle) => RelativeBubbleSlide(
         widgetKey: _secondSlideKey,
         child: RelativeBubbleSlideChild(
@@ -173,7 +179,7 @@ class _BubbleShowcaseDemoWidget extends StatelessWidget {
         ),
       );
 
-  /// Creates the fourth slide.
+  /// Creates the third slide.
   BubbleSlide _thirdSlide(TextStyle textStyle) => RelativeBubbleSlide(
         highlightPadding: 4,
         passThroughMode: PassthroughMode.INSIDE_WITH_NOTIFICATION,

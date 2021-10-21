@@ -32,6 +32,8 @@ abstract class BubbleSlide {
   final VoidCallback? onEnter;
 
   /// Triggered when this slide has been exited.
+  ///
+  /// Also triggered when onDismissed is called on the BubbleShowcase
   final VoidCallback? onExit;
 
   final PassthroughMode passThroughMode;
@@ -110,7 +112,7 @@ abstract class BubbleSlide {
     if (bubbleShowcase.counterText != null) {
       children.add(
         Positioned(
-          bottom: 5,
+          bottom: MediaQuery.of(context).padding.bottom + 5,
           left: 0,
           right: 0,
           child: Text(
@@ -130,10 +132,15 @@ abstract class BubbleSlide {
     // Add Close button
     if (bubbleShowcase.showCloseButton) {
       children.add(Positioned(
-        top: MediaQuery.of(context).padding.top,
+        top: MediaQuery.of(context).padding.top + 5,
         left: 0,
         child: GestureDetector(
-          onTap: () => goToSlide(slidesCount),
+          onTap: () {
+            if (bubbleShowcase.onDismiss != null) {
+              bubbleShowcase.onDismiss!();
+            }
+            goToSlide(slidesCount);
+          },
           child: Icon(
             Icons.close,
             color: writeColor,
@@ -505,7 +512,7 @@ class RelativeBubbleSlideChild extends BubbleSlideChild {
               : availableWidth / 2,
         );
       default:
-        throw ("Slide is outside the view area");
+        throw ('Slide is outside the view area');
     }
   }
 
@@ -566,7 +573,7 @@ class RelativeBubbleSlideChild extends BubbleSlideChild {
         );
 
       default:
-        throw ("Slide is outside the view area");
+        throw ('Slide is outside the view area');
     }
   }
 
@@ -627,7 +634,7 @@ class RelativeBubbleSlideChild extends BubbleSlideChild {
           left: highlightPosition.right,
         );
       default:
-        throw ("Slide is outside the view area");
+        throw ('Slide is outside the view area');
     }
   }
 
@@ -670,7 +677,7 @@ class RelativeBubbleSlideChild extends BubbleSlideChild {
               : availableWidth / 2,
         );
       default:
-        throw ("Slide is outside the view area");
+        throw ('Slide is outside the view area');
     }
   }
 }
