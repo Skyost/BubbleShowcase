@@ -1,4 +1,5 @@
 import 'package:bubble_showcase/bubble_showcase.dart';
+import 'package:bubble_showcase_example/draggableShowcase.dart';
 import 'package:flutter/material.dart';
 
 import 'speech_bubble.dart';
@@ -11,11 +12,25 @@ class _BubbleShowcaseDemoApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) => MaterialApp(
         title: 'Bubble Showcase Demo',
-        home: Scaffold(
-          appBar: AppBar(
-            title: const Text('Bubble Showcase Demo'),
+        home: DefaultTabController(
+          length: 2,
+          child: Scaffold(
+            appBar: AppBar(
+              title: const Text('Bubble Showcase Demo'),
+              bottom: const TabBar(
+                tabs: [
+                  const Tab(text: 'Advanced positioning demo'),
+                  const Tab(text: 'Demo'),
+                ],
+              ),
+            ),
+            body: TabBarView(
+              children: [
+                BubbleShowcaseDraggableWidget(),
+                _BubbleShowcaseDemoWidget(),
+              ],
+            ),
           ),
-          body: _BubbleShowcaseDemoWidget(),
         ),
       );
 }
@@ -41,6 +56,7 @@ class _BubbleShowcaseDemoWidget extends StatelessWidget {
           color: Colors.white,
         );
     return BubbleShowcase(
+      initialDelay: const Duration(milliseconds: 500),
       onDismiss: () {
         print('I got dismissed!');
       },
