@@ -304,18 +304,18 @@ class RelativeBubbleSlideChild extends BubbleSlideChild {
   /// Heavily assisted by using an `Align` widget to align it within the expanded space
   final bool enableExtraSpace;
 
-  /// Determines, in size a percentage from  0.5 to 0.95, the height of the parent container that will be
+  /// Determines, in size a percentage from  0.15 to 0.45, the height of the parent container that will be
   /// recognized as "Middle" space, starting from the center.
   ///
   /// Used by the automatic positioning system to determine
-  /// which positioning strategy to use. Defaults to 65%.
+  /// which positioning strategy to use. Defaults to 15% of the area from the middle to be counted as "center space".
   final double middlePointHeight;
 
-  /// Determines, in size a percentage from 0.5 to 0.95, the width of the parent container that will be
+  /// Determines, in size a percentage from 0.15 to 0.45, the width of the parent container that will be
   /// recognized as "Middle" space, starting from the center.
   ///
   /// Used by the automatic positioning system to determine
-  /// which positioning strategy to use.Defaults to 65%.
+  /// which positioning strategy to use. Defaults to 15% of the area from the middle to be counted as "center space".
   final double middlePointWidth;
 
   /// Creates a new relative bubble slide child instance.
@@ -340,6 +340,8 @@ class RelativeBubbleSlideChild extends BubbleSlideChild {
     if (enableExtraSpace) {
       int quadrant = _getQuadrantFromRelativePosition(
           highlightPosition, parentSize, direction);
+
+      print('DEBUG => quadrant $quadrant');
 
       switch (direction) {
         case AxisDirection.up:
@@ -399,10 +401,23 @@ class RelativeBubbleSlideChild extends BubbleSlideChild {
     Size parentSize,
     AxisDirection direction,
   ) {
+    // Distance of the right point from the left edge
     final r = highlightPosition.right;
+    // Distance of the left point from the left edge
     final l = highlightPosition.left;
+    // Ditsance from the top point from the top
     final t = highlightPosition.top;
+    // Distance from the bottom point from the top
     final b = highlightPosition.bottom;
+
+    // Distance of the right point from the right edge
+    final dr = parentSize.width - r;
+    // Distance of the left point from the left edge
+    final dl = l;
+    // Distance of the top point from the top
+    final dt = t;
+    // Distance of the bottom point from the bottom;
+    final db = parentSize.height - b;
 
     final w = parentSize.width;
     final h = parentSize.height;
@@ -423,8 +438,21 @@ class RelativeBubbleSlideChild extends BubbleSlideChild {
     final mx = l + highlightAreaSize.width / 2;
     final my = t + highlightAreaSize.height / 2;
 
-    final leansToRightSide = highlightPosition.right < highlightPosition.left;
-    final leansToBottomSide = highlightPosition.bottom < highlightPosition.top;
+    // It leans to the right side if the distance from the right edge is less than from the right edge
+    final leansToRightSide = dr < dl;
+
+    // It leans to the bottom side if the distance from the bottom edge is less than from the top edge
+    final leansToBottomSide = db < dt;
+    print('===================================');
+    print('leansToBottomSide: $leansToBottomSide');
+    print(
+      'highlightPosition.bottom: ${highlightPosition.bottom}, highlightPosition.top: ${highlightPosition.top}',
+    );
+    print('===================================');
+    print('leansToRightSide: $leansToRightSide');
+    print(
+      'highlightPosition.right: ${highlightPosition.right}, highlightPosition.left: ${highlightPosition.left}',
+    );
 
     final isHorizontal =
         direction == AxisDirection.left || direction == AxisDirection.right;
@@ -433,31 +461,41 @@ class RelativeBubbleSlideChild extends BubbleSlideChild {
         direction == AxisDirection.up || direction == AxisDirection.down;
 
     // Calculate extremes first, cases where we cannot center (AKA quadrant 5)
-    if (r >= w * 0.95 && isVertical) {
+    if (dr <= w * 0.05 && isVertical) {
+      // Extreme right (slide on top or bottom of highlighted area)
+      print('1st');
       if (leansToBottomSide) {
         return 4;
       } else {
         return 1;
       }
-    } else if (l <= w * 0.05 && isVertical) {
+    } else if (dl <= w * 0.05 && isVertical) {
+      // Extreme left (slide on top or bottom of highlighted area)
+      print('2nd');
       if (leansToBottomSide) {
         return 3;
       } else {
         return 2;
       }
-    } else if (b >= h * 0.95 && isHorizontal) {
+    } else if (db <= h * 0.05 && isHorizontal) {
+      // Extreme bottom (slide on left or right of highlighted area)
+      print('3rd');
       if (leansToRightSide) {
         return 4;
       } else {
         return 3;
       }
-    } else if (t <= h * 0.05 && isHorizontal) {
+    } else if (dt <= h * 0.05 && isHorizontal) {
+      // Extreme top (slide on left or right of highlighted area)
+      print('4th');
       if (leansToRightSide) {
         return 1;
       } else {
         return 2;
       }
     }
+
+    print("Quadrant calculated normally");
 
     // Calculate quadrants normally
     if (mx >= x1 && my <= y1) {
