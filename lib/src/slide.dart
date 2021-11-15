@@ -61,6 +61,7 @@ abstract class BubbleSlide {
     BubbleShowcase bubbleShowcase,
     int currentSlideIndex,
     void Function(int) goToSlide,
+    VoidCallback close,
   ) {
     Position highlightPosition = getHighlightPosition(
       context,
@@ -139,7 +140,7 @@ abstract class BubbleSlide {
             if (bubbleShowcase.onDismiss != null) {
               bubbleShowcase.onDismiss!();
             }
-            goToSlide(slidesCount);
+            close();
           },
           child: Icon(
             Icons.close,

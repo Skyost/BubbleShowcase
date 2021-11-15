@@ -176,6 +176,19 @@ class _BubbleShowcaseState extends State<BubbleShowcase>
     }
   }
 
+  void close() {
+    currentSlideEntry?.remove();
+    triggerOnExit();
+    currentSlideEntry = null;
+    if (widget.doNotReopenOnClose) {
+      SharedPreferences.getInstance().then((preferences) {
+        preferences.setBool(
+            '${widget.bubbleShowcaseId}.${widget.bubbleShowcaseVersion}',
+            false);
+      });
+    }
+  }
+
   /// Creates the current slide entry.
   OverlayEntry createCurrentSlideEntry() => OverlayEntry(
         builder: (context) => widget.bubbleSlides[currentSlideIndex].build(
@@ -185,6 +198,7 @@ class _BubbleShowcaseState extends State<BubbleShowcase>
           (position) {
             setState(() => goToNextEntryOrClose(position));
           },
+          close,
         ),
       );
 
