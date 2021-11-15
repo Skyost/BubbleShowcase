@@ -100,11 +100,28 @@ class _BubbleShowcaseState extends State<BubbleShowcase>
   }
 
   @override
-  Widget build(BuildContext context) =>
-      NotificationListener<BubbleShowcaseNotification>(
-        onNotification: processNotification,
-        child: widget.child,
-      );
+  void didUpdateWidget(BubbleShowcase oldWidget) {
+    super.didUpdateWidget(oldWidget);
+
+    if (oldWidget.enabled != widget.enabled) {
+      WidgetsBinding.instance?.addPostFrameCallback((_) async {
+        if (await widget.shouldOpenShowcase) {
+          await Future.delayed(widget.initialDelay);
+          if (mounted) {
+            goToNextEntryOrClose(0);
+          }
+        }
+      });
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return NotificationListener<BubbleShowcaseNotification>(
+      onNotification: processNotification,
+      child: widget.child,
+    );
+  }
 
   @override
   void dispose() {
