@@ -20,6 +20,14 @@ enum PassthroughMode {
   NONE,
 }
 
+enum Quadrant {
+  TOP_LEFT,
+  TOP_RIGHT,
+  CENTER,
+  BOTTOM_LEFT,
+  BOTTOM_RIGHT,
+}
+
 /// A simple bubble slide that allows to highlight a specific screen zone.
 abstract class BubbleSlide {
   /// The slide shape.
@@ -277,17 +285,30 @@ abstract class BubbleSlideChild {
   /// Builds the bubble slide child widget.
   Widget build(BuildContext context, Position targetPosition, Size parentSize) {
     Position position = getPosition(context, targetPosition, parentSize);
+    Alignment alignment = getAlignment(context, targetPosition, parentSize);
+
+    print("DEBUG => alignment: $alignment, position: $position");
+
     return Positioned(
       top: position.top,
       right: position.right,
       bottom: position.bottom,
       left: position.left,
-      child: widget,
+      child: Align(
+        alignment: alignment,
+        child: widget,
+      ),
     );
   }
 
   /// Returns child position according to the highlight position and parent size.
   Position getPosition(
+    BuildContext context,
+    Position highlightPosition,
+    Size parentSize,
+  );
+
+  Alignment getAlignment(
     BuildContext context,
     Position highlightPosition,
     Size parentSize,
@@ -339,7 +360,7 @@ class RelativeBubbleSlideChild extends BubbleSlideChild {
     Size parentSize,
   ) {
     if (enableExtraSpace) {
-      int quadrant = _getQuadrantFromRelativePosition(
+      Quadrant quadrant = _getQuadrantFromRelativePosition(
           highlightPosition, parentSize, direction);
 
       print('DEBUG => quadrant $quadrant');
@@ -397,7 +418,7 @@ class RelativeBubbleSlideChild extends BubbleSlideChild {
     }
   }
 
-  int _getQuadrantFromRelativePosition(
+  Quadrant _getQuadrantFromRelativePosition(
     Position highlightPosition,
     Size parentSize,
     AxisDirection direction,
@@ -461,38 +482,40 @@ class RelativeBubbleSlideChild extends BubbleSlideChild {
     final isVertical =
         direction == AxisDirection.up || direction == AxisDirection.down;
 
-    // Calculate extremes first, cases where we cannot center (AKA quadrant 5)
+    // Calculate extremes first, cases where
+    // it might be in quadrant 5, but we cannot center due to possible
+    // collitions with the screen edges.
     if (dr <= w * 0.05 && isVertical) {
       // Extreme right (slide on top or bottom of highlighted area)
       print('1st');
       if (leansToBottomSide) {
-        return 4;
+        return Quadrant.BOTTOM_RIGHT;
       } else {
-        return 1;
+        return Quadrant.TOP_RIGHT;
       }
     } else if (dl <= w * 0.05 && isVertical) {
       // Extreme left (slide on top or bottom of highlighted area)
       print('2nd');
       if (leansToBottomSide) {
-        return 3;
+        return Quadrant.BOTTOM_LEFT;
       } else {
-        return 2;
+        return Quadrant.TOP_LEFT;
       }
     } else if (db <= h * 0.05 && isHorizontal) {
       // Extreme bottom (slide on left or right of highlighted area)
       print('3rd');
       if (leansToRightSide) {
-        return 4;
+        return Quadrant.BOTTOM_RIGHT;
       } else {
-        return 3;
+        return Quadrant.BOTTOM_LEFT;
       }
     } else if (dt <= h * 0.05 && isHorizontal) {
       // Extreme top (slide on left or right of highlighted area)
       print('4th');
       if (leansToRightSide) {
-        return 1;
+        return Quadrant.TOP_RIGHT;
       } else {
-        return 2;
+        return Quadrant.TOP_LEFT;
       }
     }
 
@@ -500,26 +523,30 @@ class RelativeBubbleSlideChild extends BubbleSlideChild {
 
     // Calculate quadrants normally
     if (mx >= x1 && my <= y1) {
-      return 1; // top right
+      print("DEBUG => Top_right");
+      return Quadrant.TOP_RIGHT;
     } else if (mx <= x2 && my <= y1) {
-      return 2; // top left
+      print("DEBUG => Top_left");
+      return Quadrant.TOP_LEFT;
     } else if (mx <= x2 && my >= y2) {
-      return 3; // bottom right
+      print("DEBUG => Bottom_left");
+      return Quadrant.BOTTOM_LEFT;
     } else if (mx >= x1 && my >= y2) {
-      return 4; // bottom left
+      print("DEBUG => Bottom_right");
+      return Quadrant.BOTTOM_RIGHT;
     } else {
-      return 5; // center (Not totally within any other quadrant)
+      return Quadrant.CENTER; // center (Not totally within any other quadrant)
     }
   }
 
   Position _getDownPositionFromQuadrant(
-    int quadrant,
+    Quadrant quadrant,
     Size parentSize,
     Position highlightPosition,
   ) {
     switch (quadrant) {
-      case 1:
-      case 4:
+      case Quadrant.TOP_RIGHT:
+      case Quadrant.BOTTOM_RIGHT:
         // It will expand to the left
         final spacingFromTheRightEdge =
             parentSize.width - highlightPosition.right;
@@ -527,14 +554,14 @@ class RelativeBubbleSlideChild extends BubbleSlideChild {
           right: spacingFromTheRightEdge,
           top: highlightPosition.bottom,
         );
-      case 2:
-      case 3:
+      case Quadrant.TOP_LEFT:
+      case Quadrant.BOTTOM_LEFT:
         // It will expand to the right
         return Position(
           left: highlightPosition.left,
           top: highlightPosition.bottom,
         );
-      case 5:
+      case Quadrant.CENTER:
         final widthFromRightEdge = parentSize.width - highlightPosition.right;
         final widthFromLeftEdge = highlightPosition.left;
         final availableWidth = widthFromRightEdge > widthFromLeftEdge
@@ -556,26 +583,26 @@ class RelativeBubbleSlideChild extends BubbleSlideChild {
   }
 
   Position _getLeftPositionFromQuadrant(
-    int quadrant,
+    Quadrant quadrant,
     Size parentSize,
     Position highlightPosition,
   ) {
     switch (quadrant) {
-      case 1:
-      case 2:
+      case Quadrant.TOP_RIGHT:
+      case Quadrant.TOP_LEFT:
         // It will expand to the bottom
         return Position(
           top: highlightPosition.top,
           right: parentSize.width - highlightPosition.left,
         );
-      case 3:
-      case 4:
+      case Quadrant.BOTTOM_RIGHT:
+      case Quadrant.BOTTOM_LEFT:
         // It will expand to the top
         return Position(
           bottom: parentSize.height - highlightPosition.bottom,
           right: parentSize.width - highlightPosition.left,
         );
-      case 5:
+      case Quadrant.CENTER:
         // It will be centered
         final topHeightFromEdge = highlightPosition.top;
         final bottomHeightFromEdge =
@@ -617,26 +644,26 @@ class RelativeBubbleSlideChild extends BubbleSlideChild {
   }
 
   Position _getRightPositionFromQuadrant(
-    int quadrant,
+    Quadrant quadrant,
     Size parentSize,
     Position highlightPosition,
   ) {
     switch (quadrant) {
-      case 1:
-      case 2:
+      case Quadrant.TOP_RIGHT:
+      case Quadrant.TOP_LEFT:
         // It will expand to the bottom
         return Position(
           top: highlightPosition.top,
           left: highlightPosition.right,
         );
-      case 3:
-      case 4:
+      case Quadrant.BOTTOM_RIGHT:
+      case Quadrant.BOTTOM_LEFT:
         // It will expand to the top
         return Position(
           bottom: parentSize.height - highlightPosition.bottom,
           left: highlightPosition.right,
         );
-      case 5:
+      case Quadrant.CENTER:
         // It will be centered
         final topHeightFromEdge = highlightPosition.top;
         final bottomHeightFromEdge =
@@ -678,13 +705,13 @@ class RelativeBubbleSlideChild extends BubbleSlideChild {
   }
 
   Position _getUpPositionFromQuadrant(
-    int quadrant,
+    Quadrant quadrant,
     Size parentSize,
     Position highlightPosition,
   ) {
     switch (quadrant) {
-      case 1:
-      case 4:
+      case Quadrant.TOP_RIGHT:
+      case Quadrant.BOTTOM_RIGHT:
         // It will expand to the left
         final spacingFromTheRightEdge =
             parentSize.width - highlightPosition.right;
@@ -692,14 +719,14 @@ class RelativeBubbleSlideChild extends BubbleSlideChild {
           right: spacingFromTheRightEdge,
           bottom: parentSize.height - highlightPosition.top,
         );
-      case 2:
-      case 3:
+      case Quadrant.TOP_LEFT:
+      case Quadrant.BOTTOM_LEFT:
         // It will expand to the right
         return Position(
           left: highlightPosition.left,
           bottom: parentSize.height - highlightPosition.top,
         );
-      case 5:
+      case Quadrant.CENTER:
         final widthFromRightEdge = parentSize.width - highlightPosition.right;
         final widthFromLeftEdge = highlightPosition.left;
         final availableWidth = widthFromRightEdge > widthFromLeftEdge
@@ -717,6 +744,29 @@ class RelativeBubbleSlideChild extends BubbleSlideChild {
         );
       default:
         throw ('Slide is outside the view area');
+    }
+  }
+
+  @override
+  Alignment getAlignment(
+    BuildContext context,
+    Position highlightPosition,
+    Size parentSize,
+  ) {
+    Quadrant quadrant = _getQuadrantFromRelativePosition(
+        highlightPosition, parentSize, direction);
+
+    switch (quadrant) {
+      case Quadrant.TOP_RIGHT:
+        return Alignment.topRight;
+      case Quadrant.TOP_LEFT:
+        return Alignment.topLeft;
+      case Quadrant.BOTTOM_LEFT:
+        return Alignment.bottomLeft;
+      case Quadrant.BOTTOM_RIGHT:
+        return Alignment.bottomRight;
+      case Quadrant.CENTER:
+        return Alignment.center;
     }
   }
 }
@@ -739,4 +789,13 @@ class AbsoluteBubbleSlideChild extends BubbleSlideChild {
     Size parentSize,
   ) =>
       positionCalculator(parentSize);
+
+  @override
+  Alignment getAlignment(
+    BuildContext context,
+    Position highlightPosition,
+    Size parentSize,
+  ) {
+    return Alignment.center;
+  }
 }
