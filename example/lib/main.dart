@@ -201,7 +201,6 @@ class _BubbleShowcaseDemoWidget extends StatelessWidget {
         passThroughMode: PassthroughMode.INSIDE_WITH_NOTIFICATION,
         widgetKey: _thirdSlideKey,
         child: RelativeBubbleSlideChild(
-          enableExtraSpace: true,
           direction: AxisDirection.down,
           widget: Padding(
             padding: const EdgeInsets.all(8.0),
@@ -237,7 +236,6 @@ class _BubbleShowcaseDemoWidget extends StatelessWidget {
   BubbleSlide _fourthSlide(TextStyle textStyle) => RelativeBubbleSlide(
         widgetKey: _fourthSlideKey,
         child: RelativeBubbleSlideChild(
-          enableExtraSpace: true,
           direction: AxisDirection.down,
           widget: Padding(
             padding: const EdgeInsets.all(8.0),
@@ -283,7 +281,6 @@ class _BubbleShowcaseDemoWidget extends StatelessWidget {
   BubbleSlide _fifthSlide(TextStyle textStyle) => RelativeBubbleSlide(
         widgetKey: _fifthSlideKey,
         child: RelativeBubbleSlideChild(
-          enableExtraSpace: true,
           direction: AxisDirection.up,
           widget: Padding(
             padding: const EdgeInsets.all(8.0),
@@ -332,7 +329,6 @@ class _BubbleShowcaseDemoWidget extends StatelessWidget {
           spreadRadius: 15,
         ),
         child: RelativeBubbleSlideChild(
-          enableExtraSpace: true,
           direction: AxisDirection.up,
           widget: Padding(
             padding: const EdgeInsets.all(16.0),
@@ -378,7 +374,6 @@ class _BubbleShowcaseDemoWidget extends StatelessWidget {
   BubbleSlide _seventhSlide(TextStyle textStyle) => RelativeBubbleSlide(
         widgetKey: _seventhSlideKey,
         child: RelativeBubbleSlideChild(
-          enableExtraSpace: true,
           direction: AxisDirection.left,
           widget: Padding(
             padding: const EdgeInsets.all(8.0),

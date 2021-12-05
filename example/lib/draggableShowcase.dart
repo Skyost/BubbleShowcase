@@ -57,51 +57,85 @@ class BubbleShowcaseDraggableWidgetState
 
   BubbleSlide _draggableSlide(TextStyle textStyle) => RelativeBubbleSlide(
         widgetKey: _draggableSlideKey,
-        child: RelativeBubbleSlideChild(
+        child: RelativeBubbleSlideChildBuilder(
           middlePointHeight: middlePointHeight,
           middlePointWidth: middlePointWidth,
-          enableExtraSpace: true,
           direction: AxisDirection.down,
-          widget: Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: SpeechBubble(
-              color: Colors.blue,
-              nipLocation: NipLocation.TOP_RIGHT,
-              child: Padding(
-                padding: const EdgeInsets.all(10),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Text(
-                      'Example Slide',
-                      style: textStyle.copyWith(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        const Padding(
-                          padding: EdgeInsets.only(right: 5),
-                          child: Icon(
-                            Icons.info_outline,
-                            color: Colors.white,
-                          ),
+          builder: (
+            ctx,
+            highlightPosition,
+            slidePosition,
+            parentSize,
+            slideAlignment,
+            slideDirection,
+          ) {
+            NipLocation getNipLocation(
+              Alignment alignment,
+              AxisDirection direction,
+            ) {
+              if (alignment == Alignment.topLeft) {
+                return NipLocation.TOP_LEFT;
+              } else if (alignment == Alignment.topRight) {
+                return NipLocation.TOP_RIGHT;
+              } else if (alignment == Alignment.bottomLeft) {
+                return NipLocation.BOTTOM_LEFT;
+              } else if (alignment == Alignment.bottomRight) {
+                return NipLocation.BOTTOM_RIGHT;
+              } else {
+                switch (direction) {
+                  case AxisDirection.up:
+                    return NipLocation.TOP;
+                  case AxisDirection.right:
+                    return NipLocation.RIGHT;
+                  case AxisDirection.down:
+                    return NipLocation.BOTTOM;
+                  case AxisDirection.left:
+                    return NipLocation.LEFT;
+                }
+              }
+            }
+
+            return Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: SpeechBubble(
+                color: Colors.blue,
+                nipLocation: getNipLocation(slideAlignment, slideDirection),
+                child: Padding(
+                  padding: const EdgeInsets.all(10),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(
+                        'Example Slide',
+                        style: textStyle.copyWith(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
                         ),
-                        Flexible(
-                          child: Text(
-                            'Example of advanced positioning system.',
-                            style: textStyle,
+                      ),
+                      Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          const Padding(
+                            padding: EdgeInsets.only(right: 5),
+                            child: Icon(
+                              Icons.info_outline,
+                              color: Colors.white,
+                            ),
                           ),
-                        )
-                      ],
-                    ),
-                  ],
+                          Flexible(
+                            child: Text(
+                              'Example of advanced positioning system.',
+                              style: textStyle,
+                            ),
+                          )
+                        ],
+                      ),
+                    ],
+                  ),
                 ),
               ),
-            ),
-          ),
+            );
+          },
         ),
       );
 }
@@ -184,8 +218,7 @@ class _BubbleShowcaseDraggableChildState
           ),
           // Center zone bottom (Horizontal)
           Positioned(
-            bottom: MediaQuery.of(context).size.height *
-                (middlePointHeight + 0.5 - 1),
+            bottom: MediaQuery.of(context).size.height * (middlePointHeight),
             left: MediaQuery.of(context).size.width * 0.055,
             right: MediaQuery.of(context).size.width * 0.055,
             child: const Divider(
