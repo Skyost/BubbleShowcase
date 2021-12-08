@@ -104,7 +104,7 @@ abstract class BubbleSlide {
     }
 
     // Add BubbleSlide
-    if (child?.widget != null) {
+    if (child?.widget != null || child?.builder != null) {
       children.add(
         child!.build(
           context,
@@ -302,11 +302,15 @@ abstract class BubbleSlideChild {
     print("DEBUG => Hello world");
     Widget childWidget;
     Position slidePosition = getPosition(context, targetPosition, parentSize);
-    Alignment alignment = getAlignment(context, targetPosition, parentSize);
+    Alignment alignment =
+        getAlignment(context, targetPosition, parentSize, direction);
 
-    print("DEBUG => alignment: $alignment, slidePosition: $slidePosition");
+    print(
+      "DEBUG => alignment: $alignment, direction: $direction, slidePosition: $slidePosition",
+    );
 
     if (builder != null) {
+      print("DEBUG => Building off the builder");
       childWidget = builder!(
         context,
         targetPosition,
@@ -316,6 +320,7 @@ abstract class BubbleSlideChild {
         direction,
       );
     } else {
+      print("DEBUG => Using the widget passed in props");
       childWidget = widget!;
     }
 
@@ -324,9 +329,12 @@ abstract class BubbleSlideChild {
       right: slidePosition.right,
       bottom: slidePosition.bottom,
       left: slidePosition.left,
-      child: Align(
-        alignment: alignment,
-        child: childWidget,
+      child: Container(
+        color: Colors.black,
+        child: Align(
+          alignment: alignment,
+          child: childWidget,
+        ),
       ),
     );
   }
@@ -342,6 +350,7 @@ abstract class BubbleSlideChild {
     BuildContext context,
     Position highlightPosition,
     Size parentSize,
+    AxisDirection direction,
   );
 }
 
@@ -399,6 +408,7 @@ class RelativeBubbleSlideChild extends BubbleSlideChild {
     BuildContext context,
     Position highlightPosition,
     Size parentSize,
+    AxisDirection direction,
   ) {
     return Alignment.center;
   }
@@ -449,6 +459,7 @@ class RelativeBubbleSlideChildBuilder extends BubbleSlideChild {
     BuildContext context,
     Position highlightPosition,
     Size parentSize,
+    AxisDirection direction,
   ) {
     Quadrant quadrant =
         AdvancedPositioningUtils.getQuadrantFromRelativePosition(
@@ -461,15 +472,60 @@ class RelativeBubbleSlideChildBuilder extends BubbleSlideChild {
 
     switch (quadrant) {
       case Quadrant.TOP_RIGHT:
-        return Alignment.topRight;
+        switch (direction) {
+          case AxisDirection.down:
+            return Alignment.topRight;
+          case AxisDirection.up:
+            return Alignment.bottomRight;
+          case AxisDirection.right:
+            return Alignment.topLeft;
+          case AxisDirection.left:
+            return Alignment.topRight;
+        }
       case Quadrant.TOP_LEFT:
-        return Alignment.topLeft;
+        switch (direction) {
+          case AxisDirection.down:
+            return Alignment.topLeft;
+          case AxisDirection.up:
+            return Alignment.bottomLeft;
+          case AxisDirection.right:
+            return Alignment.topLeft;
+          case AxisDirection.left:
+            return Alignment.topRight;
+        }
       case Quadrant.BOTTOM_LEFT:
-        return Alignment.bottomLeft;
+        switch (direction) {
+          case AxisDirection.down:
+            return Alignment.topLeft;
+          case AxisDirection.up:
+            return Alignment.bottomLeft;
+          case AxisDirection.right:
+            return Alignment.bottomLeft;
+          case AxisDirection.left:
+            return Alignment.bottomRight;
+        }
       case Quadrant.BOTTOM_RIGHT:
-        return Alignment.bottomRight;
+        switch (direction) {
+          case AxisDirection.down:
+            return Alignment.topRight;
+          case AxisDirection.up:
+            return Alignment.bottomRight;
+          case AxisDirection.right:
+            return Alignment.bottomLeft;
+          case AxisDirection.left:
+            return Alignment.bottomRight;
+        }
       case Quadrant.CENTER:
-        return Alignment.center;
+        switch (direction) {
+          case AxisDirection.down:
+            return Alignment.topCenter;
+          case AxisDirection.up:
+            return Alignment.bottomCenter;
+          case AxisDirection.left:
+            return Alignment.centerRight;
+          case AxisDirection.right:
+            return Alignment.centerLeft;
+        }
     }
   }
 
@@ -544,6 +600,7 @@ class AbsoluteBubbleSlideChild extends BubbleSlideChild {
     BuildContext context,
     Position highlightPosition,
     Size parentSize,
+    AxisDirection direction,
   ) {
     return Alignment.center;
   }

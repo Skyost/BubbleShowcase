@@ -81,14 +81,18 @@ class BubbleShowcaseDraggableWidgetState
                 return NipLocation.BOTTOM_LEFT;
               } else if (alignment == Alignment.bottomRight) {
                 return NipLocation.BOTTOM_RIGHT;
+              } else if (alignment == Alignment.centerLeft) {
+                return NipLocation.LEFT;
+              } else if (alignment == Alignment.centerRight) {
+                return NipLocation.RIGHT;
               } else {
                 switch (direction) {
                   case AxisDirection.up:
-                    return NipLocation.TOP;
+                    return NipLocation.BOTTOM;
                   case AxisDirection.right:
                     return NipLocation.RIGHT;
                   case AxisDirection.down:
-                    return NipLocation.BOTTOM;
+                    return NipLocation.TOP;
                   case AxisDirection.left:
                     return NipLocation.LEFT;
                 }
