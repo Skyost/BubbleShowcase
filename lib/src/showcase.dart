@@ -34,6 +34,14 @@ class BubbleShowcase extends StatefulWidget {
   /// Wether this showcase should be presented.
   final bool enabled;
 
+  /// Handler that executes when the showcase is dismissed by the close icon
+  final VoidCallback? onDismiss;
+
+  /// Handler that will execute when the showcase finishes
+  ///
+  /// Note that this handler will also execute when `onDismiss` is triggered
+  final VoidCallback? onEnd;
+
   /// Creates a new bubble showcase instance.
   BubbleShowcase({
     required this.bubbleShowcaseId,
@@ -45,6 +53,8 @@ class BubbleShowcase extends StatefulWidget {
     this.showCloseButton = true,
     this.initialDelay = Duration.zero,
     this.enabled = true,
+    this.onDismiss,
+    this.onEnd,
   }) : assert(bubbleSlides.isNotEmpty);
 
   @override
@@ -90,11 +100,28 @@ class _BubbleShowcaseState extends State<BubbleShowcase>
   }
 
   @override
-  Widget build(BuildContext context) =>
-      NotificationListener<BubbleShowcaseNotification>(
-        onNotification: processNotification,
-        child: widget.child,
-      );
+  void didUpdateWidget(BubbleShowcase oldWidget) {
+    super.didUpdateWidget(oldWidget);
+
+    if (oldWidget.enabled != widget.enabled) {
+      WidgetsBinding.instance?.addPostFrameCallback((_) async {
+        if (await widget.shouldOpenShowcase) {
+          await Future.delayed(widget.initialDelay);
+          if (mounted) {
+            goToNextEntryOrClose(0);
+          }
+        }
+      });
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return NotificationListener<BubbleShowcaseNotification>(
+      onNotification: processNotification,
+      child: widget.child,
+    );
+  }
 
   @override
   void dispose() {
@@ -131,6 +158,9 @@ class _BubbleShowcaseState extends State<BubbleShowcase>
     triggerOnExit();
 
     if (isFinished) {
+      if (widget.onEnd != null) {
+        widget.onEnd!();
+      }
       currentSlideEntry = null;
       if (widget.doNotReopenOnClose) {
         SharedPreferences.getInstance().then((preferences) {
@@ -146,6 +176,19 @@ class _BubbleShowcaseState extends State<BubbleShowcase>
     }
   }
 
+  void close() {
+    currentSlideEntry?.remove();
+    triggerOnExit();
+    currentSlideEntry = null;
+    if (widget.doNotReopenOnClose) {
+      SharedPreferences.getInstance().then((preferences) {
+        preferences.setBool(
+            '${widget.bubbleShowcaseId}.${widget.bubbleShowcaseVersion}',
+            false);
+      });
+    }
+  }
+
   /// Creates the current slide entry.
   OverlayEntry createCurrentSlideEntry() => OverlayEntry(
         builder: (context) => widget.bubbleSlides[currentSlideIndex].build(
@@ -155,6 +198,7 @@ class _BubbleShowcaseState extends State<BubbleShowcase>
           (position) {
             setState(() => goToNextEntryOrClose(position));
           },
+          close,
         ),
       );
 
@@ -171,9 +215,10 @@ class _BubbleShowcaseState extends State<BubbleShowcase>
 
   /// Allows to trigger exit callbacks.
   void triggerOnExit() {
-    if (currentSlideIndex >= 0 &&
-        currentSlideIndex < widget.bubbleSlides.length) {
-      VoidCallback? callback = widget.bubbleSlides[currentSlideIndex].onExit;
+    if (currentSlideIndex > 0 &&
+        currentSlideIndex <= widget.bubbleSlides.length) {
+      VoidCallback? callback =
+          widget.bubbleSlides[currentSlideIndex - 1].onExit;
       if (callback != null) {
         callback();
       }
